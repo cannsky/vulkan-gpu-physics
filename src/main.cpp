@@ -5,10 +5,20 @@
 #include <random>
 #include "physics/VulkanContext.h"
 #include "physics/PhysicsEngine.h"
+#include "logger/Logger.h"
 
 int main() {
-    std::cout << "Tulpar Physics - GPU-based physics simulation using Vulkan" << std::endl;
-    std::cout << "============================================================" << std::endl;
+    // Configure logging system
+    Logger::getInstance().setLogLevel(LogLevel::INFO);
+    Logger::getInstance().enableCategory(LogCategory::PHYSICS);
+    Logger::getInstance().enableCategory(LogCategory::PARTICLES);
+    Logger::getInstance().enableCategory(LogCategory::PERFORMANCE);
+    Logger::getInstance().setOutputFile("physics_simulation.log");
+    
+    std::cout << "Vulkan GPU Physics - Unified physics simulation system" << std::endl;
+    std::cout << "======================================================" << std::endl;
+    
+    LOG_INFO(LogCategory::GENERAL, "Starting Vulkan GPU Physics simulation");
     
     // Initialize Vulkan context
     auto vulkanContext = std::make_shared<VulkanContext>();
@@ -78,6 +88,9 @@ int main() {
         totalTime += deltaTime;
         frameCount++;
         
+        // Log frame time for performance monitoring
+        Logger::getInstance().logFrameTime(deltaTime);
+        
         // Print statistics every second
         if (totalTime >= 1.0f) {
             auto particles = physicsEngine->getParticles();
@@ -93,6 +106,11 @@ int main() {
                 maxHeight = std::max(maxHeight, particle.position[1]);
             }
             avgHeight /= particles.size();
+            
+            // Log performance statistics
+            Logger::getInstance().logParticleCount(static_cast<uint32_t>(particles.size()));
+            LOG_PERFORMANCE_INFO("FPS: " + std::to_string(frameCount) + 
+                               ", Avg Height: " + std::to_string(avgHeight));
             
             std::cout << "FPS: " << frameCount 
                       << ", Particles: " << particles.size()

@@ -1,6 +1,6 @@
 #include "ParticleSystem.h"
-#include "BufferManager.h"
-#include "../VulkanContext.h"
+#include "../physics/components/BufferManager.h"
+#include "../physics/VulkanContext.h"
 #include <iostream>
 #include <cstring>
 

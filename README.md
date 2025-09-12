@@ -1,45 +1,68 @@
-# Tulpar Physics
+# Vulkan GPU Physics
 
-A GPU-based physics simulation system using Vulkan compute shaders and C++.
+A unified GPU-accelerated physics simulation system using Vulkan compute shaders and C++. Supports both particle-based and rigid body physics with advanced collision detection.
 
 ## Features
 
+- **Unified Physics Architecture**: Support for both particles and rigid bodies in a single system
 - **GPU-accelerated physics**: Uses Vulkan compute shaders for high-performance physics calculations
-- **Particle simulation**: Supports real-time particle physics with gravity, collisions, and dynamics
-- **Cross-platform**: Built with modern C++17 and Vulkan for cross-platform compatibility
-- **Modular design**: Clean separation between Vulkan context management and physics system
+- **Advanced Collision System**: Broad-phase and narrow-phase collision detection with multiple shape types
+- **Rigid Body Dynamics**: Full 6-DOF rigid body simulation with proper mass properties
+- **Particle Simulation**: Real-time particle physics with gravity, collisions, and dynamics
+- **Configurable Logging**: Multi-category logging system with performance monitoring
+- **Cross-platform**: Built with modern C++23 and Vulkan for cross-platform compatibility
+- **Modular Design**: Clean separation between physics systems, collision detection, and Vulkan context
 
 ## Architecture
 
-The system consists of several key components:
+The system consists of several key components organized in a modular architecture:
 
-### VulkanContext
-Manages Vulkan initialization, device selection, and resource management:
-- Instance creation with validation layers (debug builds)
-- Physical device selection with compute queue support
-- Logical device and command pool creation
+### Core Systems
 
-### VulkanPhysics
-Main physics system that orchestrates GPU-based physics calculations:
-- Buffer management for particle data and uniforms
-- Compute pipeline setup and shader loading
-- Physics simulation loop with GPU synchronization
+#### PhysicsEngine (`src/physics/`)
+Main physics orchestrator that coordinates all subsystems:
+- Manages particle system, rigid body system, and collision system
+- Coordinates GPU compute operations and synchronization
+- Provides unified interface for physics simulation
 
-### Compute Shaders
-GPU kernels written in GLSL that perform the actual physics calculations:
-- Particle integration (position and velocity updates)
-- Gravity application
-- Basic collision detection and response
-- Ground plane collision with damping
+#### Particle System (`src/particles/`)
+Manages particle-based physics simulation:
+- GPU-accelerated particle integration
+- Inter-particle collision detection
+- Configurable gravity and forces
+
+#### Rigid Body System (`src/rigidbody/`)
+Handles rigid body dynamics:
+- Support for spheres, boxes, and capsules
+- Proper mass properties and inertia calculations
+- Static and dynamic bodies
+
+#### Collision System (`src/collision/`)
+Advanced collision detection and response:
+- Broad-phase spatial culling
+- Narrow-phase shape-specific detection
+- Contact resolution with restitution and friction
+
+#### Logger System (`src/logger/`)
+Configurable multi-category logging:
+- Performance monitoring
+- Physics event tracking
+- Per-category filtering
+
+#### Vulkan Context (`src/vulkan/`)
+Vulkan abstraction layer:
+- Device management and buffer allocation
+- Compute pipeline creation and execution
+- Cross-platform Vulkan initialization
 
 ## Building
 
 ### Prerequisites
 
 - CMake 3.16 or higher
-- C++17 compatible compiler
+- C++23 compatible compiler
 - Vulkan SDK or development libraries
-- GLSL compiler (glslangValidator or glslc)
+- GLSL compiler (glslangValidator)
 
 ### Ubuntu/Debian Dependencies
 
@@ -54,8 +77,8 @@ sudo apt install -y spirv-tools glslang-tools
 
 ```bash
 # Clone the repository
-git clone https://github.com/cannsky/tulpar-physics.git
-cd tulpar-physics
+git clone https://github.com/cannsky/vulkan-gpu-physics.git
+cd vulkan-gpu-physics
 
 # Create build directory
 mkdir build && cd build
