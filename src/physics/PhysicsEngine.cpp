@@ -2,7 +2,8 @@
 #include "VulkanContext.h"
 #include "components/BufferManager.h"
 #include "components/ComputePipeline.h"
-#include "components/ParticleSystem.h"
+#include "../particles/ParticleSystem.h"
+#include "../logger/Logger.h"
 #include <iostream>
 
 PhysicsEngine::PhysicsEngine(std::shared_ptr<VulkanContext> context)
@@ -16,17 +17,19 @@ PhysicsEngine::~PhysicsEngine() {
 bool PhysicsEngine::initialize(uint32_t maxParticles) {
     this->maxParticles = maxParticles;
     
+    LOG_PHYSICS_INFO("Initializing PhysicsEngine with " + std::to_string(maxParticles) + " max particles");
+    
     // Initialize buffer manager
     bufferManager = std::make_shared<BufferManager>(vulkanContext);
     if (!bufferManager->initialize(maxParticles)) {
-        std::cerr << "Failed to initialize buffer manager!" << std::endl;
+        LOG_ERROR(LogCategory::PHYSICS, "Failed to initialize buffer manager");
         return false;
     }
     
     // Initialize compute pipeline
     computePipeline = std::make_shared<ComputePipeline>(vulkanContext, bufferManager);
     if (!computePipeline->initialize()) {
-        std::cerr << "Failed to initialize compute pipeline!" << std::endl;
+        LOG_ERROR(LogCategory::PHYSICS, "Failed to initialize compute pipeline");
         return false;
     }
     

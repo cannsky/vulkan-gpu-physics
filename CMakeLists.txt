@@ -20,7 +20,10 @@ add_executable(tulpar-physics
     src/physics/PhysicsEngine.cpp
     src/physics/components/BufferManager.cpp
     src/physics/components/ComputePipeline.cpp
-    src/physics/components/ParticleSystem.cpp
+    src/particles/ParticleSystem.cpp
+    src/rigidbody/RigidBodySystem.cpp
+    src/collision/CollisionSystem.cpp
+    src/logger/Logger.cpp
 )
 
 # Include directories
@@ -64,4 +67,20 @@ add_dependencies(tulpar-physics shaders)
 # Set output directory for shaders
 set_target_properties(tulpar-physics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
+# Add test executable
+add_executable(physics-tests
+    tests/test_physics_systems.cpp
+    src/rigidbody/RigidBodySystem.cpp
+    src/collision/CollisionSystem.cpp
+    src/logger/Logger.cpp
+)
+
+target_include_directories(physics-tests PRIVATE
+    src
+)
+
+target_link_libraries(physics-tests
+    ${Vulkan_LIBRARIES}
 )
