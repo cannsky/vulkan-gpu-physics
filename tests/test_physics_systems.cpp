@@ -1,25 +1,30 @@
 #include "../src/collision/CollisionSystem.h"
 #include "../src/rigidbody/RigidBodySystem.h"
 #include "../src/logger/Logger.h"
+#include "framework/TestManager.h"
+#include "RigidBodyTests.h"
+#include "CollisionTests.h"
+#include "LoggerTests.h"
 #include <iostream>
 #include <cassert>
 #include <cmath>
+#include <memory>
 
-// Simple test framework
-class TestFramework {
+// Legacy test framework for backward compatibility
+class LegacyTestFramework {
 public:
     static void runTests() {
         Logger::getInstance().setLogLevel(LogLevel::INFO);
         Logger::getInstance().enableCategory(LogCategory::COLLISION);
         Logger::getInstance().enableCategory(LogCategory::RIGIDBODY);
         
-        std::cout << "Running Physics System Tests..." << std::endl;
+        std::cout << "Running Legacy Physics System Tests..." << std::endl;
         
         testRigidBodyCreation();
         testSphereCollision();
         testLogging();
         
-        std::cout << "All tests passed!" << std::endl;
+        std::cout << "All legacy tests passed!" << std::endl;
     }
     
 private:
@@ -130,9 +135,63 @@ private:
     }
 };
 
+// New test framework runner
+void runNewTestFramework() {
+    try {
+        std::cout << "\n=== Running New Test Framework ===" << std::endl;
+        
+        // Configure logger for testing
+        Logger::getInstance().setLogLevel(LogLevel::INFO);
+        Logger::getInstance().enableCategory(LogCategory::COLLISION);
+        Logger::getInstance().enableCategory(LogCategory::RIGIDBODY);
+        Logger::getInstance().enableCategory(LogCategory::GENERAL);
+        Logger::getInstance().enableConsoleOutput(true);
+        
+        // Get test manager instance
+        TestManager& testManager = TestManager::getInstance();
+        
+        // Register RigidBody tests
+        testManager.registerTest(std::make_unique<RigidBodyCreationTest>());
+        testManager.registerTest(std::make_unique<RigidBodyMassCalculationTest>());
+        
+        // Register Collision tests
+        testManager.registerTest(std::make_unique<SphereCollisionDetectionTest>());
+        testManager.registerTest(std::make_unique<MaterialPropertiesTest>());
+        testManager.registerTest(std::make_unique<NonCollisionTest>());
+        
+        // Register Logger tests
+        testManager.registerTest(std::make_unique<LoggingLevelsTest>());
+        testManager.registerTest(std::make_unique<CategorySpecificLoggingTest>());
+        testManager.registerTest(std::make_unique<PerformanceLoggingTest>());
+        testManager.registerTest(std::make_unique<LoggerConfigurationTest>());
+        
+        // Run all tests
+        TestSummary summary = testManager.runAllTests();
+        
+        // Print detailed results if there were failures
+        if (summary.failedTests > 0) {
+            testManager.printDetailedResults(summary);
+        }
+        
+        if (!summary.allTestsPassed()) {
+            throw std::runtime_error("New test framework failed with " + std::to_string(summary.failedTests) + " test(s)");
+        }
+        
+    } catch (const std::exception& e) {
+        std::cerr << "New test framework failed with exception: " << e.what() << std::endl;
+        throw;
+    }
+}
+
 int main() {
     try {
-        TestFramework::runTests();
+        // Run legacy tests for backward compatibility
+        LegacyTestFramework::runTests();
+        
+        // Run new test framework
+        runNewTestFramework();
+        
+        std::cout << "\n🎉 All test frameworks completed successfully!" << std::endl;
         return 0;
     } catch (const std::exception& e) {
         std::cerr << "Test failed with exception: " << e.what() << std::endl;
