@@ -1,0 +1,128 @@
+cmake_minimum_required(VERSION 3.16)
+project(tulpar-physics-test VERSION 1.0.0)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Enable testing
+enable_testing()
+
+# Create a mock Vulkan header for testing
+file(WRITE ${CMAKE_BINARY_DIR}/vulkan_mock.h "#pragma once\n// Mock Vulkan header for testing\n")
+
+# Add test executable with new framework
+add_executable(physics-tests
+    tests/test_runner.cpp
+    tests/framework/TestManager.cpp
+    src/logger/Logger.cpp
+)
+
+target_include_directories(physics-tests PRIVATE
+    src
+    tests
+    ${CMAKE_BINARY_DIR}
+)
+
+# Create a minimal logger implementation for testing
+file(WRITE ${CMAKE_BINARY_DIR}/logger_mock.cpp "
+#include \"../src/logger/Logger.h\"
+#include <iostream>
+
+Logger& Logger::getInstance() {
+    static Logger instance;
+    return instance;
+}
+
+void Logger::setLogLevel(LogLevel level) { minLogLevel = level; }
+void Logger::enableCategory(LogCategory category, bool enabled) { categoryEnabled[static_cast<int>(category)] = enabled; }
+void Logger::disableCategory(LogCategory category) { categoryEnabled[static_cast<int>(category)] = false; }
+void Logger::enableConsoleOutput(bool enabled) { consoleOutput = enabled; }
+void Logger::enableTimestamps(bool enabled) { timestampsEnabled = enabled; }
+
+void Logger::log(LogLevel level, LogCategory category, const std::string& message) {
+    if (consoleOutput && shouldLog(level, category)) {
+        std::cout << \"[\" << logLevelToString(level) << \"] [\" << logCategoryToString(category) << \"] \" << message << std::endl;
+    }
+}
+
+void Logger::trace(LogCategory category, const std::string& message) { log(LogLevel::TRACE, category, message); }
+void Logger::debug(LogCategory category, const std::string& message) { log(LogLevel::DEBUG, category, message); }
+void Logger::info(LogCategory category, const std::string& message) { log(LogLevel::INFO, category, message); }
+void Logger::warn(LogCategory category, const std::string& message) { log(LogLevel::WARN, category, message); }
+void Logger::error(LogCategory category, const std::string& message) { log(LogLevel::ERROR, category, message); }
+
+void Logger::logPhysics(LogLevel level, const std::string& message) { log(level, LogCategory::PHYSICS, message); }
+void Logger::logCollision(LogLevel level, const std::string& message) { log(level, LogCategory::COLLISION, message); }
+void Logger::logRigidBody(LogLevel level, const std::string& message) { log(level, LogCategory::RIGIDBODY, message); }
+void Logger::logParticles(LogLevel level, const std::string& message) { log(level, LogCategory::PARTICLES, message); }
+void Logger::logVulkan(LogLevel level, const std::string& message) { log(level, LogCategory::VULKAN, message); }
+void Logger::logPerformance(LogLevel level, const std::string& message) { log(level, LogCategory::PERFORMANCE, message); }
+
+void Logger::logFrameTime(float frameTime) { log(LogLevel::INFO, LogCategory::PERFORMANCE, \"Frame time: \" + std::to_string(frameTime)); }
+void Logger::logCollisionCount(uint32_t count) { log(LogLevel::INFO, LogCategory::PERFORMANCE, \"Collisions: \" + std::to_string(count)); }
+void Logger::logParticleCount(uint32_t count) { log(LogLevel::INFO, LogCategory::PERFORMANCE, \"Particles: \" + std::to_string(count)); }
+void Logger::logRigidBodyCount(uint32_t count) { log(LogLevel::INFO, LogCategory::PERFORMANCE, \"Rigid bodies: \" + std::to_string(count)); }
+
+Logger::~Logger() {}
+
+bool Logger::shouldLog(LogLevel level, LogCategory category) const {
+    return level >= minLogLevel && categoryEnabled[static_cast<int>(category)];
+}
+
+std::string Logger::logLevelToString(LogLevel level) const {
+    switch (level) {
+        case LogLevel::TRACE: return \"TRACE\";
+        case LogLevel::DEBUG: return \"DEBUG\";
+        case LogLevel::INFO: return \"INFO\";
+        case LogLevel::WARN: return \"WARN\";
+        case LogLevel::ERROR: return \"ERROR\";
+        default: return \"UNKNOWN\";
+    }
+}
+
+std::string Logger::logCategoryToString(LogCategory category) const {
+    switch (category) {
+        case LogCategory::GENERAL: return \"GENERAL\";
+        case LogCategory::PHYSICS: return \"PHYSICS\";
+        case LogCategory::COLLISION: return \"COLLISION\";
+        case LogCategory::RIGIDBODY: return \"RIGIDBODY\";
+        case LogCategory::PARTICLES: return \"PARTICLES\";
+        case LogCategory::VULKAN: return \"VULKAN\";
+        case LogCategory::PERFORMANCE: return \"PERFORMANCE\";
+        default: return \"UNKNOWN\";
+    }
+}
+")
+
+target_sources(physics-tests PRIVATE ${CMAKE_BINARY_DIR}/logger_mock.cpp)
+
+# Create mock RigidBody header
+file(WRITE ${CMAKE_BINARY_DIR}/RigidBody_mock.h "
+#pragma once
+
+struct RigidBody {
+    float position[3];
+    float velocity[3];
+    float angularVelocity[3];
+    float rotation[4];
+    float mass;
+    float invMass;
+    float inertia[3];
+    float invInertia[3];
+    float restitution;
+    float friction;
+    uint32_t shapeType;
+    float shapeData[4];
+    uint32_t isStatic;
+    float padding[3];
+};
+
+enum class RigidBodyShape : uint32_t {
+    SPHERE = 0,
+    BOX = 1,
+    CAPSULE = 2
+};
+")
+
+# Register tests with CTest
+add_test(NAME PhysicsEngineTests COMMAND physics-tests)
