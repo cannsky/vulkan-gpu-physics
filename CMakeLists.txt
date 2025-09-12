@@ -79,6 +79,7 @@ add_executable(physics-tests
 
 target_include_directories(physics-tests PRIVATE
     src
+    ${Vulkan_INCLUDE_DIRS}
 )
 
 target_link_libraries(physics-tests
