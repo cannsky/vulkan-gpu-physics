@@ -69,9 +69,13 @@ set_target_properties(tulpar-physics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-# Add test executable
+# Enable testing
+enable_testing()
+
+# Add test executable with new framework
 add_executable(physics-tests
-    tests/test_physics_systems.cpp
+    tests/test_runner.cpp
+    tests/framework/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/collision/CollisionSystem.cpp
     src/logger/Logger.cpp
@@ -79,9 +83,35 @@ add_executable(physics-tests
 
 target_include_directories(physics-tests PRIVATE
     src
+    tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
 target_link_libraries(physics-tests
     ${Vulkan_LIBRARIES}
 )
+
+# Register tests with CTest
+add_test(NAME PhysicsEngineTests COMMAND physics-tests)
+
+# Add legacy test executable for compatibility
+add_executable(legacy-physics-tests
+    tests/test_physics_systems.cpp
+    tests/framework/TestManager.cpp
+    src/rigidbody/RigidBodySystem.cpp
+    src/collision/CollisionSystem.cpp
+    src/logger/Logger.cpp
+)
+
+target_include_directories(legacy-physics-tests PRIVATE
+    src
+    tests
+    ${Vulkan_INCLUDE_DIRS}
+)
+
+target_link_libraries(legacy-physics-tests
+    ${Vulkan_LIBRARIES}
+)
+
+# Register legacy tests with CTest
+add_test(NAME LegacyPhysicsTests COMMAND legacy-physics-tests)
