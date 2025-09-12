@@ -1,7 +1,8 @@
 #include "VulkanContext.h"
+#include "../vulkan/VulkanInstance.h"
+#include "../vulkan/VulkanDevice.h"
+#include "../vulkan/VulkanCommandPool.h"
 #include <iostream>
-#include <set>
-#include <cstring>
 
 VulkanContext::VulkanContext() {
 }
@@ -11,23 +12,24 @@ VulkanContext::~VulkanContext() {
 }
 
 bool VulkanContext::initialize() {
-    if (!createInstance()) {
-        std::cerr << "Failed to create Vulkan instance!" << std::endl;
+    // Create and initialize Vulkan instance
+    vulkanInstance = std::make_shared<VulkanInstance>();
+    if (!vulkanInstance->initialize()) {
+        std::cerr << "Failed to initialize Vulkan instance!" << std::endl;
         return false;
     }
     
-    if (!pickPhysicalDevice()) {
-        std::cerr << "Failed to find a suitable GPU!" << std::endl;
+    // Create and initialize Vulkan device
+    vulkanDevice = std::make_shared<VulkanDevice>(vulkanInstance->getInstance());
+    if (!vulkanDevice->initialize()) {
+        std::cerr << "Failed to initialize Vulkan device!" << std::endl;
         return false;
     }
     
-    if (!createLogicalDevice()) {
-        std::cerr << "Failed to create logical device!" << std::endl;
-        return false;
-    }
-    
-    if (!createCommandPool()) {
-        std::cerr << "Failed to create command pool!" << std::endl;
+    // Create and initialize command pool
+    vulkanCommandPool = std::make_shared<VulkanCommandPool>(vulkanDevice);
+    if (!vulkanCommandPool->initialize()) {
+        std::cerr << "Failed to initialize Vulkan command pool!" << std::endl;
         return false;
     }
     
@@ -36,196 +38,32 @@ bool VulkanContext::initialize() {
 }
 
 void VulkanContext::cleanup() {
-    if (commandPool != VK_NULL_HANDLE) {
-        vkDestroyCommandPool(device, commandPool, nullptr);
-        commandPool = VK_NULL_HANDLE;
-    }
-    
-    if (device != VK_NULL_HANDLE) {
-        vkDestroyDevice(device, nullptr);
-        device = VK_NULL_HANDLE;
-    }
-    
-    if (instance != VK_NULL_HANDLE) {
-        vkDestroyInstance(instance, nullptr);
-        instance = VK_NULL_HANDLE;
-    }
+    vulkanCommandPool.reset();
+    vulkanDevice.reset();
+    vulkanInstance.reset();
 }
 
-bool VulkanContext::createInstance() {
-    if (enableValidationLayers && !checkValidationLayerSupport()) {
-        std::cerr << "Validation layers requested, but not available!" << std::endl;
-        return false;
-    }
-    
-    VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Tulpar Physics";
-    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = "Tulpar Engine";
-    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
-    
-    VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
-    
-    auto extensions = getRequiredExtensions();
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
-    
-    if (enableValidationLayers) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
-    } else {
-        createInfo.enabledLayerCount = 0;
-    }
-    
-    VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
-    return result == VK_SUCCESS;
+// Convenience accessors
+VkInstance VulkanContext::getInstance() const {
+    return vulkanInstance ? vulkanInstance->getInstance() : VK_NULL_HANDLE;
 }
 
-bool VulkanContext::pickPhysicalDevice() {
-    uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-    
-    if (deviceCount == 0) {
-        std::cerr << "Failed to find GPUs with Vulkan support!" << std::endl;
-        return false;
-    }
-    
-    std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
-    
-    for (const auto& device : devices) {
-        if (isDeviceSuitable(device)) {
-            physicalDevice = device;
-            queueFamilyIndices = findQueueFamilies(device);
-            
-            VkPhysicalDeviceProperties deviceProperties;
-            vkGetPhysicalDeviceProperties(device, &deviceProperties);
-            std::cout << "Selected GPU: " << deviceProperties.deviceName << std::endl;
-            break;
-        }
-    }
-    
-    return physicalDevice != VK_NULL_HANDLE;
+VkPhysicalDevice VulkanContext::getPhysicalDevice() const {
+    return vulkanDevice ? vulkanDevice->getPhysicalDevice() : VK_NULL_HANDLE;
 }
 
-bool VulkanContext::createLogicalDevice() {
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
-    
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {indices.computeFamily.value()};
-    
-    float queuePriority = 1.0f;
-    for (uint32_t queueFamily : uniqueQueueFamilies) {
-        VkDeviceQueueCreateInfo queueCreateInfo{};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = queueFamily;
-        queueCreateInfo.queueCount = 1;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
-        queueCreateInfos.push_back(queueCreateInfo);
-    }
-    
-    VkPhysicalDeviceFeatures deviceFeatures{};
-    
-    VkDeviceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-    createInfo.pQueueCreateInfos = queueCreateInfos.data();
-    createInfo.pEnabledFeatures = &deviceFeatures;
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-    
-    if (enableValidationLayers) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
-    } else {
-        createInfo.enabledLayerCount = 0;
-    }
-    
-    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
-        return false;
-    }
-    
-    vkGetDeviceQueue(device, indices.computeFamily.value(), 0, &computeQueue);
-    
-    return true;
+VkDevice VulkanContext::getDevice() const {
+    return vulkanDevice ? vulkanDevice->getDevice() : VK_NULL_HANDLE;
 }
 
-bool VulkanContext::createCommandPool() {
-    QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
-    
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    poolInfo.queueFamilyIndex = queueFamilyIndices.computeFamily.value();
-    
-    return vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) == VK_SUCCESS;
+VkQueue VulkanContext::getComputeQueue() const {
+    return vulkanDevice ? vulkanDevice->getComputeQueue() : VK_NULL_HANDLE;
 }
 
-QueueFamilyIndices VulkanContext::findQueueFamilies(VkPhysicalDevice device) {
-    QueueFamilyIndices indices;
-    
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-    
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-    
-    int i = 0;
-    for (const auto& queueFamily : queueFamilies) {
-        if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
-            indices.computeFamily = i;
-        }
-        
-        if (indices.isComplete()) {
-            break;
-        }
-        
-        i++;
-    }
-    
-    return indices;
+uint32_t VulkanContext::getComputeQueueFamily() const {
+    return vulkanDevice ? vulkanDevice->getComputeQueueFamily() : 0;
 }
 
-bool VulkanContext::isDeviceSuitable(VkPhysicalDevice device) {
-    QueueFamilyIndices indices = findQueueFamilies(device);
-    return indices.isComplete();
-}
-
-std::vector<const char*> VulkanContext::getRequiredExtensions() {
-    std::vector<const char*> extensions;
-    
-    if (enableValidationLayers) {
-        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
-    
-    return extensions;
-}
-
-bool VulkanContext::checkValidationLayerSupport() {
-    uint32_t layerCount;
-    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-    
-    std::vector<VkLayerProperties> availableLayers(layerCount);
-    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-    
-    for (const char* layerName : validationLayers) {
-        bool layerFound = false;
-        
-        for (const auto& layerProperties : availableLayers) {
-            if (strcmp(layerName, layerProperties.layerName) == 0) {
-                layerFound = true;
-                break;
-            }
-        }
-        
-        if (!layerFound) {
-            return false;
-        }
-    }
-    
-    return true;
+VkCommandPool VulkanContext::getCommandPool() const {
+    return vulkanCommandPool ? vulkanCommandPool->getCommandPool() : VK_NULL_HANDLE;
 }

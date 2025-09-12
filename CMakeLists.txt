@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(tulpar-physics VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find required packages
@@ -13,8 +13,14 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 # Add executable
 add_executable(tulpar-physics
     src/main.cpp
+    src/vulkan/VulkanInstance.cpp
+    src/vulkan/VulkanDevice.cpp
+    src/vulkan/VulkanCommandPool.cpp
     src/physics/VulkanContext.cpp
-    src/physics/VulkanPhysics.cpp
+    src/physics/PhysicsEngine.cpp
+    src/physics/components/BufferManager.cpp
+    src/physics/components/ComputePipeline.cpp
+    src/physics/components/ParticleSystem.cpp
 )
 
 # Include directories

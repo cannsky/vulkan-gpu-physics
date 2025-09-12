@@ -4,7 +4,7 @@
 #include <thread>
 #include <random>
 #include "physics/VulkanContext.h"
-#include "physics/VulkanPhysics.h"
+#include "physics/PhysicsEngine.h"
 
 int main() {
     std::cout << "Tulpar Physics - GPU-based physics simulation using Vulkan" << std::endl;
@@ -17,10 +17,10 @@ int main() {
         return -1;
     }
     
-    // Initialize physics system
-    auto physicsSystem = std::make_unique<VulkanPhysics>(vulkanContext);
-    if (!physicsSystem->initialize(1024)) {
-        std::cerr << "Failed to initialize physics system!" << std::endl;
+    // Initialize physics engine
+    auto physicsEngine = std::make_unique<PhysicsEngine>(vulkanContext);
+    if (!physicsEngine->initialize(1024)) {
+        std::cerr << "Failed to initialize physics engine!" << std::endl;
         return -1;
     }
     
@@ -45,14 +45,14 @@ int main() {
         particle.velocity[2] = velDist(gen);
         particle.mass = massDist(gen);
         
-        if (!physicsSystem->addParticle(particle)) {
+        if (!physicsEngine->addParticle(particle)) {
             std::cerr << "Failed to add particle " << i << std::endl;
             break;
         }
     }
     
     // Set gravity
-    physicsSystem->setGravity(0.0f, -9.81f, 0.0f);
+    physicsEngine->setGravity(0.0f, -9.81f, 0.0f);
     
     std::cout << "Starting physics simulation..." << std::endl;
     std::cout << "Press Ctrl+C to stop the simulation" << std::endl;
@@ -73,14 +73,14 @@ int main() {
         deltaTime = std::min(deltaTime, 0.016f); // Max 16ms
         
         // Update physics
-        physicsSystem->updatePhysics(deltaTime);
+        physicsEngine->updatePhysics(deltaTime);
         
         totalTime += deltaTime;
         frameCount++;
         
         // Print statistics every second
         if (totalTime >= 1.0f) {
-            auto particles = physicsSystem->getParticles();
+            auto particles = physicsEngine->getParticles();
             
             // Calculate average height of particles
             float avgHeight = 0.0f;
