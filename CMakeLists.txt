@@ -97,6 +97,7 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
     tests/test_physics_systems.cpp
+    tests/framework/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/collision/CollisionSystem.cpp
     src/logger/Logger.cpp
@@ -104,6 +105,7 @@ add_executable(legacy-physics-tests
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
+    tests
     ${Vulkan_INCLUDE_DIRS}
 )
 

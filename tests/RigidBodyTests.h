@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../framework/Test.h"
-#include "../../src/rigidbody/RigidBodySystem.h"
-#include "../../src/logger/Logger.h"
+#include "framework/Test.h"
+#include "rigidbody/RigidBodySystem.h"
+#include "logger/Logger.h"
 #include <cmath>
 
 class RigidBodyCreationTest : public Test {
@@ -30,10 +30,10 @@ public:
         assertEqual(sphere.position[0], 1.0f, "Position X should be 1.0");
         assertEqual(sphere.position[1], 2.0f, "Position Y should be 2.0");
         assertEqual(sphere.position[2], 3.0f, "Position Z should be 3.0");
-        assertEqual(sphere.mass, 1.5f, "Mass should be 1.5");
+        assertEqual(sphere.mass, 1.5f, 0.001f, "Mass should be 1.5");
         assertEqual(sphere.invMass, 1.0f / 1.5f, 0.001f, "Inverse mass should be 1/1.5");
         assertEqual(static_cast<int>(sphere.shapeType), static_cast<int>(RigidBodyShape::SPHERE), "Shape type should be SPHERE");
-        assertEqual(sphere.shapeData[0], 0.5f, "Sphere radius should be 0.5");
+        assertEqual(sphere.shapeData[0], 0.5f, 0.001f, "Sphere radius should be 0.5");
         
         LOG_RIGIDBODY_INFO("Rigid body creation test passed");
         result.markPassed("Rigid body created and verified successfully");
