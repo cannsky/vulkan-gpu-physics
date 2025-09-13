@@ -3,8 +3,11 @@
 #include <chrono>
 #include <thread>
 #include <random>
-#include "physics/VulkanContext.h"
-#include "physics/PhysicsEngine.h"
+#include "managers/vulkanmanager/VulkanManager.h"
+#include "managers/physicsmanager/PhysicsManager.h"
+#include "managers/particlemanager/ParticleManager.h"
+#include "managers/physicsmanager/rigidbodies/RigidBodyFactory.h"
+#include "managers/physicsmanager/LayerSystem.h"
 #include "logger/Logger.h"
 
 int main() {
@@ -20,19 +23,26 @@ int main() {
     
     LOG_INFO(LogCategory::GENERAL, "Starting Vulkan GPU Physics simulation");
     
-    // Initialize Vulkan context
-    auto vulkanContext = std::make_shared<VulkanContext>();
-    if (!vulkanContext->initialize()) {
-        std::cerr << "Failed to initialize Vulkan context!" << std::endl;
+    // Initialize managers in order
+    auto& vulkanManager = VulkanManager::getInstance();
+    if (!vulkanManager.initialize()) {
+        std::cerr << "Failed to initialize Vulkan manager!" << std::endl;
         return -1;
     }
     
-    // Initialize physics engine
-    auto physicsEngine = std::make_unique<PhysicsEngine>(vulkanContext);
-    if (!physicsEngine->initialize(1024)) {
-        std::cerr << "Failed to initialize physics engine!" << std::endl;
+    auto& physicsManager = PhysicsManager::getInstance();
+    if (!physicsManager.initialize()) {
+        std::cerr << "Failed to initialize physics manager!" << std::endl;
+        vulkanManager.cleanup();
         return -1;
     }
+    
+    auto& particleManager = ParticleManager::getInstance();
+    
+    // Set up layer system
+    auto& layerSystem = LayerSystem::getInstance();
+    auto particleLayer = layerSystem.createLayer("Particles");
+    auto staticLayer = layerSystem.createLayer("Static");
     
     // Set up random number generation for particle initialization
     std::random_device rd;
@@ -55,14 +65,26 @@ int main() {
         particle.velocity[2] = velDist(gen);
         particle.mass = massDist(gen);
         
-        if (!physicsEngine->addParticle(particle)) {
+        if (!particleManager.addParticle(particle)) {
             std::cerr << "Failed to add particle " << i << std::endl;
             break;
         }
     }
     
+    // Create some rigid bodies using the factory
+    auto& rigidBodyFactory = RigidBodyFactory::getInstance();
+    
+    // Create a ground plane
+    auto groundPlane = rigidBodyFactory.createStaticPlane(0.0f, staticLayer);
+    std::cout << "Created ground plane at y=0" << std::endl;
+    
+    // Create some spheres
+    auto sphere1 = rigidBodyFactory.createSphere(0.0f, 5.0f, 0.0f, 1.0f, 1.0f, particleLayer);
+    auto sphere2 = rigidBodyFactory.createSphere(2.0f, 8.0f, 0.0f, 0.5f, 0.5f, particleLayer);
+    std::cout << "Created rigid body spheres" << std::endl;
+    
     // Set gravity
-    physicsEngine->setGravity(0.0f, -9.81f, 0.0f);
+    physicsManager.setGravity(0.0f, -9.81f, 0.0f);
     
     std::cout << "Starting physics simulation..." << std::endl;
     std::cout << "Press Ctrl+C to stop the simulation" << std::endl;
@@ -83,7 +105,7 @@ int main() {
         deltaTime = std::min(deltaTime, 0.016f); // Max 16ms
         
         // Update physics
-        physicsEngine->updatePhysics(deltaTime);
+        physicsManager.updatePhysics(deltaTime);
         
         totalTime += deltaTime;
         frameCount++;
@@ -93,19 +115,21 @@ int main() {
         
         // Print statistics every second
         if (totalTime >= 1.0f) {
-            auto particles = physicsEngine->getParticles();
+            auto particles = particleManager.getParticles();
             
             // Calculate average height of particles
             float avgHeight = 0.0f;
-            float minHeight = particles[0].position[1];
-            float maxHeight = particles[0].position[1];
+            float minHeight = particles.empty() ? 0.0f : particles[0].position[1];
+            float maxHeight = particles.empty() ? 0.0f : particles[0].position[1];
             
             for (const auto& particle : particles) {
                 avgHeight += particle.position[1];
                 minHeight = std::min(minHeight, particle.position[1]);
                 maxHeight = std::max(maxHeight, particle.position[1]);
             }
-            avgHeight /= particles.size();
+            if (!particles.empty()) {
+                avgHeight /= particles.size();
+            }
             
             // Log performance statistics
             Logger::getInstance().logParticleCount(static_cast<uint32_t>(particles.size()));
@@ -114,6 +138,7 @@ int main() {
             
             std::cout << "FPS: " << frameCount 
                       << ", Particles: " << particles.size()
+                      << ", Layers: " << layerSystem.getLayerCount()
                       << ", Avg Height: " << avgHeight
                       << ", Min Height: " << minHeight
                       << ", Max Height: " << maxHeight
@@ -133,6 +158,10 @@ int main() {
             );
         }
     }
+    
+    // Cleanup managers
+    physicsManager.cleanup();
+    vulkanManager.cleanup();
     
     std::cout << "Simulation ended." << std::endl;
     return 0;
