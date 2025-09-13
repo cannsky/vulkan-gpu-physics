@@ -1,22 +1,19 @@
 #pragma once
 
 #include "../BaseManager.h"
-#include "../../physics/Particle.h"
-#include <vulkan/vulkan.h>
+#include "../../components/physics/Particle.h"
 #include <vector>
 #include <memory>
 
 // Forward declarations
 class VulkanManager;
-class BufferManager;
-class ComputePipeline;
 class ParticleManager;
 class CollisionManager;
+class PhysicsLayerWorker;
 
 /**
  * Central physics management system.
- * Replaces PhysicsEngine with a singleton manager pattern.
- * Coordinates all physics subsystems.
+ * Coordinates all physics subsystems using worker-based approach.
  */
 class PhysicsManager : public BaseManager {
 public:
@@ -35,9 +32,8 @@ public:
     bool setMaxParticles(uint32_t maxParticles);
     uint32_t getMaxParticles() const { return maxParticles; }
     
-    // Component accessors for advanced usage
-    std::shared_ptr<BufferManager> getBufferManager() const { return bufferManager; }
-    std::shared_ptr<ComputePipeline> getComputePipeline() const { return computePipeline; }
+    // Worker accessors
+    std::shared_ptr<PhysicsLayerWorker> getLayerWorker() const { return layerWorker; }
     
     // Subsystem accessors
     std::shared_ptr<ParticleManager> getParticleManager() const;
@@ -47,15 +43,10 @@ private:
     PhysicsManager() = default;
     ~PhysicsManager() = default;
     
-    void recordComputeCommandBuffer();
-    
     bool initialized = false;
     uint32_t maxParticles = 1024;
     
-    std::shared_ptr<BufferManager> bufferManager;
-    std::shared_ptr<ComputePipeline> computePipeline;
-    
-    VkCommandBuffer computeCommandBuffer = VK_NULL_HANDLE;
+    std::shared_ptr<PhysicsLayerWorker> layerWorker;
     
     struct {
         float x = 0.0f;

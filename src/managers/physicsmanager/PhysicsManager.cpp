@@ -2,8 +2,7 @@
 #include "../vulkanmanager/VulkanManager.h"
 #include "../particlemanager/ParticleManager.h"
 #include "../collisionmanager/CollisionManager.h"
-#include "../../physics/components/BufferManager.h"
-#include "../../physics/components/ComputePipeline.h"
+#include "workers/PhysicsLayerWorker.h"
 
 PhysicsManager& PhysicsManager::getInstance() {
     static PhysicsManager instance;
@@ -24,8 +23,11 @@ bool PhysicsManager::initialize() {
             }
         }
         
-        // For now, skip complex component initialization to avoid circular dependencies
-        // This can be added back once we resolve all the Vulkan class dependencies
+        // Initialize physics layer worker
+        layerWorker = std::make_shared<PhysicsLayerWorker>();
+        if (!layerWorker->initialize()) {
+            return false;
+        }
         
         initialized = true;
         return true;
@@ -36,21 +38,9 @@ bool PhysicsManager::initialize() {
 }
 
 void PhysicsManager::cleanup() {
-    auto& vulkanManager = VulkanManager::getInstance();
-    
-    if (computeCommandBuffer != VK_NULL_HANDLE && vulkanManager.isInitialized()) {
-        // Command buffer will be freed when command pool is destroyed
-        computeCommandBuffer = VK_NULL_HANDLE;
-    }
-    
-    if (computePipeline) {
-        computePipeline->cleanup();
-        computePipeline.reset();
-    }
-    
-    if (bufferManager) {
-        bufferManager->cleanup();
-        bufferManager.reset();
+    if (layerWorker) {
+        layerWorker->cleanup();
+        layerWorker.reset();
     }
     
     // Cleanup subsystems
@@ -110,8 +100,4 @@ std::shared_ptr<ParticleManager> PhysicsManager::getParticleManager() const {
 
 std::shared_ptr<CollisionManager> PhysicsManager::getCollisionManager() const {
     return std::shared_ptr<CollisionManager>(&CollisionManager::getInstance(), [](CollisionManager*){});
-}
-
-void PhysicsManager::recordComputeCommandBuffer() {
-    // Simplified for now - will be implemented once Vulkan dependencies are resolved
 }

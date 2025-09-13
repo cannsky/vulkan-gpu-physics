@@ -16,10 +16,10 @@ add_executable(tulpar-physics
     src/vulkan/VulkanInstance.cpp
     src/vulkan/VulkanDevice.cpp
     src/vulkan/VulkanCommandPool.cpp
-    src/physics/VulkanContext.cpp
-    src/physics/PhysicsEngine.cpp
-    src/physics/components/BufferManager.cpp
-    src/physics/components/ComputePipeline.cpp
+    src/vulkan/VulkanContext.cpp
+    src/components/physics/PhysicsEngine.cpp
+    src/vulkan/physics/BufferManager.cpp
+    src/vulkan/physics/ComputePipeline.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
@@ -31,7 +31,7 @@ add_executable(tulpar-physics
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
     src/managers/collisionmanager/workers/GPUBufferWorker.cpp
     src/managers/shadermanager/ShaderManager.cpp
-    src/managers/physicsmanager/LayerSystem.cpp
+    src/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/physicsmanager/rigidbodies/RigidBodyFactory.cpp
     src/managers/testmanager/TestManager.cpp
 )
@@ -84,7 +84,7 @@ enable_testing()
 
 # Add test executable with new framework
 add_executable(physics-tests
-    src/components/tests/test_runner.cpp
+    src/test_runner.cpp
     src/managers/testmanager/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
@@ -95,7 +95,7 @@ add_executable(physics-tests
 
 target_include_directories(physics-tests PRIVATE
     src
-    src/components/tests
+    src/managers/testmanager/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
@@ -108,7 +108,7 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
-    src/components/tests/test_physics_systems.cpp
+    src/test_physics_systems.cpp
     src/managers/testmanager/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
@@ -119,7 +119,7 @@ add_executable(legacy-physics-tests
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
-    src/components/tests
+    src/managers/testmanager/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 

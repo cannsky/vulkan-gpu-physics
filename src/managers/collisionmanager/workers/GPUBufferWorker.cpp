@@ -1,6 +1,6 @@
 #include "GPUBufferWorker.h"
-#include "../../../physics/VulkanContext.h"
-#include "../../../physics/components/BufferManager.h"
+#include "../../../vulkan/VulkanContext.h"
+#include "../../../vulkan/physics/BufferManager.h"
 
 GPUBufferWorker::GPUBufferWorker(std::shared_ptr<VulkanContext> context, std::shared_ptr<BufferManager> bufferManager)
     : vulkanContext(context), bufferManager(bufferManager), maxContacts(0) {

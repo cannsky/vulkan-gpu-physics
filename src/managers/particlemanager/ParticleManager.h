@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../BaseManager.h"
-#include "../../physics/Particle.h"
+#include "../../components/physics/Particle.h"
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <memory>

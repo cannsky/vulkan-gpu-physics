@@ -7,7 +7,7 @@
 #include "managers/physicsmanager/PhysicsManager.h"
 #include "managers/particlemanager/ParticleManager.h"
 #include "managers/physicsmanager/rigidbodies/RigidBodyFactory.h"
-#include "managers/physicsmanager/LayerSystem.h"
+#include "managers/physicsmanager/workers/PhysicsLayerWorker.h"
 #include "managers/logmanager/Logger.h"
 
 int main() {
@@ -39,10 +39,10 @@ int main() {
     
     auto& particleManager = ParticleManager::getInstance();
     
-    // Set up layer system
-    auto& layerSystem = LayerSystem::getInstance();
-    auto particleLayer = layerSystem.createLayer("Particles");
-    auto staticLayer = layerSystem.createLayer("Static");
+    // Set up layer system using PhysicsLayerWorker through PhysicsManager
+    auto physicsLayerWorker = physicsManager.getLayerWorker();
+    auto particleLayer = physicsLayerWorker->createLayer("Particles");
+    auto staticLayer = physicsLayerWorker->createLayer("Static");
     
     // Set up random number generation for particle initialization
     std::random_device rd;
@@ -138,7 +138,7 @@ int main() {
             
             std::cout << "FPS: " << frameCount 
                       << ", Particles: " << particles.size()
-                      << ", Layers: " << layerSystem.getLayerCount()
+                      << ", Layers: " << physicsLayerWorker->getLayerCount()
                       << ", Avg Height: " << avgHeight
                       << ", Min Height: " << minHeight
                       << ", Max Height: " << maxHeight

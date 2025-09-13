@@ -1,7 +1,7 @@
-#include "framework/TestManager.h"
-#include "RigidBodyTests.h"
-#include "CollisionTests.h"
-#include "LoggerTests.h"
+#include "managers/testmanager/TestManager.h"
+#include "managers/testmanager/tests/RigidBodyTests.h"
+#include "managers/testmanager/tests/CollisionTests.h"
+#include "managers/testmanager/tests/LoggerTests.h"
 #include "managers/logmanager/Logger.h"
 #include <memory>
 #include <iostream>
@@ -15,8 +15,12 @@ int main() {
         Logger::getInstance().enableCategory(LogCategory::GENERAL);
         Logger::getInstance().enableConsoleOutput(true);
         
-        // Get test manager instance
+        // Get test manager instance and initialize
         TestManager& testManager = TestManager::getInstance();
+        if (!testManager.initialize()) {
+            std::cerr << "Failed to initialize TestManager" << std::endl;
+            return -1;
+        }
         
         // Register RigidBody tests
         testManager.registerTest(std::make_unique<RigidBodyCreationTest>());
@@ -40,6 +44,9 @@ int main() {
         if (summary.failedTests > 0) {
             testManager.printDetailedResults(summary);
         }
+        
+        // Cleanup test manager
+        testManager.cleanup();
         
         // Return appropriate exit code
         return summary.allTestsPassed() ? 0 : 1;
