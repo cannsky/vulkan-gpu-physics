@@ -20,14 +20,16 @@ add_executable(tulpar-physics
     src/physics/PhysicsEngine.cpp
     src/physics/components/BufferManager.cpp
     src/physics/components/ComputePipeline.cpp
-    src/particles/ParticleSystem.cpp
     src/rigidbody/RigidBodySystem.cpp
-    src/collision/CollisionSystem.cpp
-    src/logger/Logger.cpp
+    src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
     src/managers/physicsmanager/PhysicsManager.cpp
     src/managers/particlemanager/ParticleManager.cpp
     src/managers/collisionmanager/CollisionManager.cpp
+    src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
+    src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
+    src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/collisionmanager/workers/GPUBufferWorker.cpp
     src/managers/shadermanager/ShaderManager.cpp
     src/managers/physicsmanager/LayerSystem.cpp
     src/managers/physicsmanager/rigidbodies/RigidBodyFactory.cpp
@@ -48,7 +50,7 @@ target_link_libraries(tulpar-physics
 # Compile shaders
 find_program(GLSLANGVALIDATOR glslangValidator REQUIRED)
 
-set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
+set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/components/shaders)
 set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 
 file(GLOB SHADERS
@@ -82,16 +84,18 @@ enable_testing()
 
 # Add test executable with new framework
 add_executable(physics-tests
-    src/managers/testmanager/tests/test_runner.cpp
+    src/components/tests/test_runner.cpp
     src/managers/testmanager/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
-    src/collision/CollisionSystem.cpp
-    src/logger/Logger.cpp
+    src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
+    src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
+    src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(physics-tests PRIVATE
     src
-    src/managers/testmanager/tests
+    src/components/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
@@ -104,16 +108,18 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
-    src/managers/testmanager/tests/test_physics_systems.cpp
+    src/components/tests/test_physics_systems.cpp
     src/managers/testmanager/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
-    src/collision/CollisionSystem.cpp
-    src/logger/Logger.cpp
+    src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
+    src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
+    src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
-    src/managers/testmanager/tests
+    src/components/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 

@@ -2,8 +2,8 @@
 #include "VulkanContext.h"
 #include "components/BufferManager.h"
 #include "components/ComputePipeline.h"
-#include "../particles/ParticleSystem.h"
-#include "../logger/Logger.h"
+#include "../managers/particlemanager/ParticleManager.h"
+#include "../managers/logmanager/Logger.h"
 #include <iostream>
 
 PhysicsEngine::PhysicsEngine(std::shared_ptr<VulkanContext> context)
@@ -33,10 +33,10 @@ bool PhysicsEngine::initialize(uint32_t maxParticles) {
         return false;
     }
     
-    // Initialize particle system
-    particleSystem = std::make_shared<ParticleSystem>(vulkanContext, bufferManager);
-    if (!particleSystem->initialize(maxParticles)) {
-        std::cerr << "Failed to initialize particle system!" << std::endl;
+    // Initialize particle manager
+    auto& particleManager = ParticleManager::getInstance();
+    if (!particleManager.initialize()) {
+        std::cerr << "Failed to initialize particle manager!" << std::endl;
         return false;
     }
     
@@ -62,25 +62,25 @@ void PhysicsEngine::cleanup() {
         computeCommandBuffer = VK_NULL_HANDLE;
     }
     
-    particleSystem.reset();
     computePipeline.reset();
     bufferManager.reset();
 }
 
 bool PhysicsEngine::addParticle(const Particle& particle) {
-    return particleSystem->addParticle(particle);
+    return ParticleManager::getInstance().addParticle(particle);
 }
 
 void PhysicsEngine::updatePhysics(float deltaTime) {
-    if (particleSystem->getParticleCount() == 0) {
+    auto& particleManager = ParticleManager::getInstance();
+    if (particleManager.getParticleCount() == 0) {
         return;
     }
     
     // Upload particle data to GPU
-    particleSystem->uploadParticlesToGPU();
+    particleManager.uploadParticlesToGPU();
     
     // Update uniform buffer with current frame data
-    particleSystem->updateUniformBuffer(deltaTime);
+    particleManager.updateUniformBuffer(deltaTime);
     
     // Record compute command buffer
     recordComputeCommandBuffer();
@@ -95,15 +95,15 @@ void PhysicsEngine::updatePhysics(float deltaTime) {
     vkQueueWaitIdle(vulkanContext->getComputeQueue());
     
     // Download updated particle data from GPU
-    particleSystem->downloadParticlesFromGPU();
+    particleManager.downloadParticlesFromGPU();
 }
 
 std::vector<Particle> PhysicsEngine::getParticles() const {
-    return particleSystem->getParticles();
+    return ParticleManager::getInstance().getParticles();
 }
 
 void PhysicsEngine::setGravity(float x, float y, float z) {
-    particleSystem->setGravity(x, y, z);
+    ParticleManager::getInstance().setGravity(x, y, z);
 }
 
 void PhysicsEngine::recordComputeCommandBuffer() {
@@ -120,7 +120,7 @@ void PhysicsEngine::recordComputeCommandBuffer() {
                            computePipeline->getPipelineLayout(), 0, 1, 
                            &descriptorSet, 0, nullptr);
     
-    uint32_t particleCount = particleSystem->getParticleCount();
+    uint32_t particleCount = ParticleManager::getInstance().getParticleCount();
     uint32_t groupCount = (particleCount + 31) / 32; // Round up to nearest multiple of 32
     vkCmdDispatch(computeCommandBuffer, groupCount, 1, 1);
     

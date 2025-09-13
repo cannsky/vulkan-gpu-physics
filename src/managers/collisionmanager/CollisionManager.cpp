@@ -1,6 +1,9 @@
 #include "CollisionManager.h"
 #include "../vulkanmanager/VulkanManager.h"
-#include "../../collision/CollisionSystem.h"
+#include "workers/BroadPhaseWorker.h"
+#include "workers/DetectCollisionWorker.h"
+#include "workers/ContactResolverWorker.h"
+#include "workers/GPUBufferWorker.h"
 
 CollisionManager& CollisionManager::getInstance() {
     static CollisionManager instance;
@@ -13,14 +16,21 @@ bool CollisionManager::initialize() {
     }
     
     try {
-        // Ensure VulkanManager is initialized
-        auto& vulkanManager = VulkanManager::getInstance();
-        if (!vulkanManager.isInitialized()) {
-            return false;
-        }
+        // Initialize workers
+        broadPhaseWorker = std::make_unique<BroadPhaseWorker>();
+        detectCollisionWorker = std::make_unique<DetectCollisionWorker>();
+        contactResolverWorker = std::make_unique<ContactResolverWorker>();
         
-        // For now, skip complex initialization to avoid circular dependencies
-        // This will be properly implemented once the dependency chain is resolved
+        // Initialize GPU buffer worker (commented out to avoid Vulkan dependencies for now)
+        // auto& vulkanManager = VulkanManager::getInstance();
+        // if (vulkanManager.isInitialized()) {
+        //     gpuBufferWorker = std::make_unique<GPUBufferWorker>(nullptr, nullptr);
+        //     gpuBufferWorker->initialize(maxContacts);
+        // }
+        
+        // Reserve memory for contacts and collision pairs
+        contacts.reserve(maxContacts);
+        collisionPairs.reserve(maxContacts);
         
         initialized = true;
         return true;
@@ -31,10 +41,17 @@ bool CollisionManager::initialize() {
 }
 
 void CollisionManager::cleanup() {
-    if (collisionSystem) {
-        collisionSystem->cleanup();
-        collisionSystem.reset();
+    if (gpuBufferWorker) {
+        gpuBufferWorker->cleanup();
+        gpuBufferWorker.reset();
     }
+    
+    contactResolverWorker.reset();
+    detectCollisionWorker.reset();
+    broadPhaseWorker.reset();
+    
+    contacts.clear();
+    collisionPairs.clear();
     
     initialized = false;
 }
@@ -44,7 +61,7 @@ bool CollisionManager::isInitialized() const {
 }
 
 void CollisionManager::updateCollisions(float deltaTime) {
-    if (!collisionSystem) {
+    if (!initialized) {
         return;
     }
     
@@ -52,49 +69,50 @@ void CollisionManager::updateCollisions(float deltaTime) {
     resolveContacts(deltaTime);
 }
 
+void CollisionManager::updateBroadPhase(const std::vector<RigidBody>& rigidBodies) {
+    if (!initialized || !broadPhaseWorker) {
+        return;
+    }
+    
+    broadPhaseWorker->updateBroadPhase(rigidBodies, collisionPairs);
+}
+
 void CollisionManager::detectCollisions() {
-    if (!collisionSystem) {
+    if (!initialized || !detectCollisionWorker) {
         return;
     }
     
     // Note: This would need a rigid body system reference
-    // For now, we'll just update the broad phase with empty data
-    std::vector<RigidBody> emptyRigidBodies;
-    collisionSystem->updateBroadPhase(emptyRigidBodies);
+    // For now, we'll just process existing collision pairs
+    // detectCollisionWorker->detectCollisions(collisionPairs, rigidBodySystem, contacts, maxContacts, contactCount);
 }
 
 void CollisionManager::resolveContacts(float deltaTime) {
-    if (!collisionSystem) {
+    if (!initialized || !contactResolverWorker) {
         return;
     }
     
-    collisionSystem->resolveContacts(deltaTime);
+    contactResolverWorker->resolveContacts(contacts, deltaTime);
 }
 
 uint32_t CollisionManager::getContactCount() const {
-    if (!collisionSystem) {
-        return 0;
-    }
-    return collisionSystem->getContactCount();
+    return contactCount;
 }
 
 uint32_t CollisionManager::getCollisionPairCount() const {
-    if (!collisionSystem) {
-        return 0;
-    }
-    return collisionSystem->getCollisionPairCount();
+    return static_cast<uint32_t>(collisionPairs.size());
 }
 
 void CollisionManager::uploadContactsToGPU() {
-    if (!collisionSystem) {
+    if (!gpuBufferWorker) {
         return;
     }
-    collisionSystem->uploadContactsToGPU();
+    gpuBufferWorker->uploadContactsToGPU(contactCount);
 }
 
 void CollisionManager::downloadContactsFromGPU() {
-    if (!collisionSystem) {
+    if (!gpuBufferWorker) {
         return;
     }
-    collisionSystem->downloadContactsFromGPU();
+    gpuBufferWorker->downloadContactsFromGPU();
 }

@@ -9,7 +9,6 @@
 class VulkanContext;
 class BufferManager;
 class ComputePipeline;
-class ParticleSystem;
 
 class PhysicsEngine {
 public:
@@ -28,7 +27,6 @@ public:
     // Component accessors for advanced usage
     std::shared_ptr<BufferManager> getBufferManager() const { return bufferManager; }
     std::shared_ptr<ComputePipeline> getComputePipeline() const { return computePipeline; }
-    std::shared_ptr<ParticleSystem> getParticleSystem() const { return particleSystem; }
 
 private:
     void recordComputeCommandBuffer();
@@ -36,7 +34,6 @@ private:
     std::shared_ptr<VulkanContext> vulkanContext;
     std::shared_ptr<BufferManager> bufferManager;
     std::shared_ptr<ComputePipeline> computePipeline;
-    std::shared_ptr<ParticleSystem> particleSystem;
     
     VkCommandBuffer computeCommandBuffer = VK_NULL_HANDLE;
     uint32_t maxParticles;
