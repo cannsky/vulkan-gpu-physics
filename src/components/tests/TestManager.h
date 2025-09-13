@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../BaseManager.h"
+#include "../../managers/BaseManager.h"
 #include "Test.h"
 #include "TestResult.h"
 #include <vector>

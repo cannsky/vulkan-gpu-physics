@@ -1,6 +1,6 @@
-#include "../../../collision/CollisionSystem.h"
-#include "../../../components/rigidbody/RigidBodySystem.h"
-#include "../../../logger/Logger.h"
+#include "../../../managers/collisionmanager/CollisionManager.h"
+#include "../../rigidbody/RigidBodySystem.h"
+#include "../../../managers/logmanager/Logger.h"
 #include "../TestManager.h"
 #include "RigidBodyTests.h"
 #include "CollisionTests.h"
@@ -79,8 +79,8 @@ private:
         sphereB.restitution = 0.7f;
         sphereB.friction = 0.4f;
         
-        // Create collision system (without Vulkan context for testing)
-        auto collisionSystem = std::shared_ptr<CollisionSystem>(nullptr);
+        // Create collision manager (without Vulkan context for testing)
+        auto collisionManager = std::shared_ptr<CollisionManager>(nullptr);
         
         // Test collision detection logic manually
         float dx = sphereA.position[0] - sphereB.position[0];
