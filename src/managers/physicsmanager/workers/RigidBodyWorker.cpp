@@ -118,7 +118,7 @@ void RigidBodyWorker::updatePhysics(float deltaTime) {
         body.position[2] += body.velocity[2] * deltaTime;
     }
     
-    // If we have a GPU system, delegate more complex operations to it
+    // Update GPU buffers if available
     if (rigidBodySystem) {
         rigidBodySystem->updateUniformBuffer(deltaTime);
     }
@@ -129,7 +129,7 @@ void RigidBodyWorker::setGravity(float x, float y, float z) {
     gravity.y = y;
     gravity.z = z;
     
-    // Forward to GPU system if available
+    // Update GPU system if available
     if (rigidBodySystem) {
         rigidBodySystem->setGravity(x, y, z);
     }

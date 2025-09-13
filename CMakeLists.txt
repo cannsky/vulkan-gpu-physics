@@ -20,7 +20,6 @@ add_executable(tulpar-physics
     src/components/physics/PhysicsEngine.cpp
     src/components/vulkan/physics/BufferManager.cpp
     src/components/vulkan/physics/ComputePipeline.cpp
-    src/components/rigidbody/RigidBodySystem.cpp
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
     src/managers/physicsmanager/PhysicsManager.cpp
