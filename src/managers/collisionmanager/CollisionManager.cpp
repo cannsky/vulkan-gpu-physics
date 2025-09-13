@@ -65,7 +65,7 @@ void CollisionManager::updateCollisions(float deltaTime) {
         return;
     }
     
-    detectCollisions();
+    // Note: detectCollisions now requires RigidBodyWorker to be passed from caller
     resolveContacts(deltaTime);
 }
 
@@ -77,14 +77,12 @@ void CollisionManager::updateBroadPhase(const std::vector<RigidBody>& rigidBodie
     broadPhaseWorker->updateBroadPhase(rigidBodies, collisionPairs);
 }
 
-void CollisionManager::detectCollisions() {
-    if (!initialized || !detectCollisionWorker) {
+void CollisionManager::detectCollisions(std::shared_ptr<RigidBodyWorker> rigidBodyWorker) {
+    if (!initialized || !detectCollisionWorker || !rigidBodyWorker) {
         return;
     }
     
-    // Note: This would need a rigid body system reference
-    // For now, we'll just process existing collision pairs
-    // detectCollisionWorker->detectCollisions(collisionPairs, rigidBodySystem, contacts, maxContacts, contactCount);
+    detectCollisionWorker->detectCollisions(collisionPairs, rigidBodyWorker, contacts, maxContacts, contactCount);
 }
 
 void CollisionManager::resolveContacts(float deltaTime) {

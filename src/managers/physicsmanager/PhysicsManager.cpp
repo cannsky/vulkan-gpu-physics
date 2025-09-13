@@ -84,7 +84,10 @@ void PhysicsManager::updatePhysics(float deltaTime) {
     
     // Update collision system
     auto collisionManager = getCollisionManager();
-    if (collisionManager && collisionManager->isInitialized()) {
+    if (collisionManager && collisionManager->isInitialized() && rigidBodyWorker) {
+        // First detect collisions with the rigid body worker
+        collisionManager->detectCollisions(rigidBodyWorker);
+        // Then update collisions (resolve contacts)
         collisionManager->updateCollisions(deltaTime);
     }
 }

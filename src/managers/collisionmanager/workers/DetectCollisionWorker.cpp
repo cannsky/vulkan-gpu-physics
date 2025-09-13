@@ -1,11 +1,11 @@
 #include "DetectCollisionWorker.h"
-#include "../../../components/rigidbody/RigidBodySystem.h"
+#include "../../../managers/physicsmanager/workers/RigidBodyWorker.h"
 #include <cmath>
 #include <cfloat>
 #include <algorithm>
 
 void DetectCollisionWorker::detectCollisions(const std::vector<CollisionPair>& collisionPairs, 
-                                            std::shared_ptr<RigidBodySystem> rigidBodySystem,
+                                            std::shared_ptr<RigidBodyWorker> rigidBodyWorker,
                                             std::vector<Contact>& contacts,
                                             uint32_t maxContacts,
                                             uint32_t& contactCount) {
@@ -14,8 +14,8 @@ void DetectCollisionWorker::detectCollisions(const std::vector<CollisionPair>& c
     
     // For each collision pair, perform narrow phase detection
     for (const auto& pair : collisionPairs) {
-        RigidBody* bodyA = rigidBodySystem->getRigidBody(pair.bodyIdA);
-        RigidBody* bodyB = rigidBodySystem->getRigidBody(pair.bodyIdB);
+        RigidBody* bodyA = rigidBodyWorker->getRigidBody(pair.bodyIdA);
+        RigidBody* bodyB = rigidBodyWorker->getRigidBody(pair.bodyIdB);
         
         if (!bodyA || !bodyB) continue;
         
