@@ -16,12 +16,14 @@ struct RigidBody {
     uint32_t shapeType; // 0=sphere, 1=box, 2=capsule
     float shapeData[4]; // shape-specific data (radius, half-extents, etc.)
     uint32_t isStatic; // 0=dynamic, 1=static
-    float padding[3]; // For alignment
+    uint32_t layer; // Physics layer for collision filtering
+    float padding[2]; // For alignment (reduced by 1 due to layer field)
 };
 
 // Shape types
 enum class RigidBodyShape : uint32_t {
     SPHERE = 0,
     BOX = 1,
-    CAPSULE = 2
+    CAPSULE = 2,
+    PLANE = 3
 };

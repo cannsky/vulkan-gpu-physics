@@ -24,6 +24,14 @@ add_executable(tulpar-physics
     src/rigidbody/RigidBodySystem.cpp
     src/collision/CollisionSystem.cpp
     src/logger/Logger.cpp
+    src/managers/vulkanmanager/VulkanManager.cpp
+    src/managers/physicsmanager/PhysicsManager.cpp
+    src/managers/particlemanager/ParticleManager.cpp
+    src/managers/collisionmanager/CollisionManager.cpp
+    src/managers/shadermanager/ShaderManager.cpp
+    src/managers/physicsmanager/LayerSystem.cpp
+    src/managers/physicsmanager/rigidbodies/RigidBodyFactory.cpp
+    src/managers/testmanager/TestManager.cpp
 )
 
 # Include directories
@@ -74,8 +82,8 @@ enable_testing()
 
 # Add test executable with new framework
 add_executable(physics-tests
-    tests/test_runner.cpp
-    tests/framework/TestManager.cpp
+    src/managers/testmanager/tests/test_runner.cpp
+    src/managers/testmanager/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/collision/CollisionSystem.cpp
     src/logger/Logger.cpp
@@ -83,7 +91,7 @@ add_executable(physics-tests
 
 target_include_directories(physics-tests PRIVATE
     src
-    tests
+    src/managers/testmanager/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
@@ -96,8 +104,8 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
-    tests/test_physics_systems.cpp
-    tests/framework/TestManager.cpp
+    src/managers/testmanager/tests/test_physics_systems.cpp
+    src/managers/testmanager/TestManager.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/collision/CollisionSystem.cpp
     src/logger/Logger.cpp
@@ -105,7 +113,7 @@ add_executable(legacy-physics-tests
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
-    tests
+    src/managers/testmanager/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
