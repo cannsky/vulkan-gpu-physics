@@ -1,4 +1,5 @@
 # Vulkan GPU Physics
+[![Vulkan - Ubuntu](https://github.com/cannsky/vulkan-gpu-physics/actions/workflows/vulkan-ubuntu.yml/badge.svg)](https://github.com/cannsky/vulkan-gpu-physics/actions/workflows/vulkan-ubuntu.yml)
 
 A unified GPU-accelerated physics simulation system using Vulkan compute shaders and C++. Supports both particle-based and rigid body physics with advanced collision detection.
 
