@@ -13,13 +13,13 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 # Add executable
 add_executable(tulpar-physics
     src/main.cpp
-    src/vulkan/VulkanInstance.cpp
-    src/vulkan/VulkanDevice.cpp
-    src/vulkan/VulkanCommandPool.cpp
-    src/vulkan/VulkanContext.cpp
+    src/components/vulkan/VulkanInstance.cpp
+    src/components/vulkan/VulkanDevice.cpp
+    src/components/vulkan/VulkanCommandPool.cpp
+    src/components/vulkan/VulkanContext.cpp
     src/components/physics/PhysicsEngine.cpp
-    src/vulkan/physics/BufferManager.cpp
-    src/vulkan/physics/ComputePipeline.cpp
+    src/components/vulkan/physics/BufferManager.cpp
+    src/components/vulkan/physics/ComputePipeline.cpp
     src/components/rigidbody/RigidBodySystem.cpp
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
@@ -34,7 +34,7 @@ add_executable(tulpar-physics
     src/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/factories/RigidBodyFactory.cpp
-    src/managers/testmanager/TestManager.cpp
+    src/components/tests/TestManager.cpp
 )
 
 # Include directories
@@ -86,7 +86,7 @@ enable_testing()
 # Add test executable with new framework
 add_executable(physics-tests
     src/test_runner.cpp
-    src/managers/testmanager/TestManager.cpp
+    src/components/tests/TestManager.cpp
     src/components/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
@@ -96,7 +96,7 @@ add_executable(physics-tests
 
 target_include_directories(physics-tests PRIVATE
     src
-    src/managers/testmanager/tests
+    src/components/tests/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
@@ -110,7 +110,7 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
     src/test_physics_systems.cpp
-    src/managers/testmanager/TestManager.cpp
+    src/components/tests/TestManager.cpp
     src/components/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
@@ -120,7 +120,7 @@ add_executable(legacy-physics-tests
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
-    src/managers/testmanager/tests
+    src/components/tests/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 

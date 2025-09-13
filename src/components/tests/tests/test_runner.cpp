@@ -1,8 +1,8 @@
-#include "components/tests/TestManager.h"
-#include "components/tests/tests/RigidBodyTests.h"
-#include "components/tests/tests/CollisionTests.h"
-#include "components/tests/tests/LoggerTests.h"
-#include "managers/logmanager/Logger.h"
+#include "../TestManager.h"
+#include "RigidBodyTests.h"
+#include "CollisionTests.h"
+#include "LoggerTests.h"
+#include "../../managers/logmanager/Logger.h"
 #include <memory>
 #include <iostream>
 

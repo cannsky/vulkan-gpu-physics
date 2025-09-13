@@ -1,7 +1,7 @@
 #include "ParticleManager.h"
 #include "../vulkanmanager/VulkanManager.h"
-#include "../../vulkan/physics/BufferManager.h"
-#include "../../vulkan/VulkanContext.h"
+#include "../../components/vulkan/physics/BufferManager.h"
+#include "../../components/vulkan/VulkanContext.h"
 #include <iostream>
 #include <cstring>
 

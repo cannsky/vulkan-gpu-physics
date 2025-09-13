@@ -1,7 +1,7 @@
 #include "PhysicsEngine.h"
-#include "../../vulkan/VulkanContext.h"
-#include "../../vulkan/physics/BufferManager.h"
-#include "../../vulkan/physics/ComputePipeline.h"
+#include "../vulkan/VulkanContext.h"
+#include "../vulkan/physics/BufferManager.h"
+#include "../vulkan/physics/ComputePipeline.h"
 #include "../../managers/particlemanager/ParticleManager.h"
 #include "../../managers/logmanager/Logger.h"
 #include <iostream>
