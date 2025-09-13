@@ -1,5 +1,5 @@
 #include "DetectCollisionWorker.h"
-#include "../../../rigidbody/RigidBodySystem.h"
+#include "../../../components/rigidbody/RigidBodySystem.h"
 #include <cmath>
 #include <cfloat>
 #include <algorithm>

@@ -1,5 +1,5 @@
 #include "../../../collision/CollisionSystem.h"
-#include "../../../rigidbody/RigidBodySystem.h"
+#include "../../../components/rigidbody/RigidBodySystem.h"
 #include "../../../logger/Logger.h"
 #include "../TestManager.h"
 #include "RigidBodyTests.h"

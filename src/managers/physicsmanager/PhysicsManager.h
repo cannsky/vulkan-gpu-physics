@@ -10,6 +10,7 @@ class VulkanManager;
 class ParticleManager;
 class CollisionManager;
 class PhysicsLayerWorker;
+class RigidBodyWorker;
 
 /**
  * Central physics management system.
@@ -34,6 +35,7 @@ public:
     
     // Worker accessors
     std::shared_ptr<PhysicsLayerWorker> getLayerWorker() const { return layerWorker; }
+    std::shared_ptr<RigidBodyWorker> getRigidBodyWorker() const { return rigidBodyWorker; }
     
     // Subsystem accessors
     std::shared_ptr<ParticleManager> getParticleManager() const;
@@ -47,6 +49,7 @@ private:
     uint32_t maxParticles = 1024;
     
     std::shared_ptr<PhysicsLayerWorker> layerWorker;
+    std::shared_ptr<RigidBodyWorker> rigidBodyWorker;
     
     struct {
         float x = 0.0f;

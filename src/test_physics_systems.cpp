@@ -1,5 +1,5 @@
 #include "managers/collisionmanager/workers/DetectCollisionWorker.h"
-#include "rigidbody/RigidBodySystem.h"
+#include "components/rigidbody/RigidBodySystem.h"
 #include "managers/logmanager/Logger.h"
 #include "managers/testmanager/TestManager.h"
 #include "RigidBodyTests.h"

@@ -20,7 +20,7 @@ add_executable(tulpar-physics
     src/components/physics/PhysicsEngine.cpp
     src/vulkan/physics/BufferManager.cpp
     src/vulkan/physics/ComputePipeline.cpp
-    src/rigidbody/RigidBodySystem.cpp
+    src/components/rigidbody/RigidBodySystem.cpp
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
     src/managers/physicsmanager/PhysicsManager.cpp
@@ -32,7 +32,8 @@ add_executable(tulpar-physics
     src/managers/collisionmanager/workers/GPUBufferWorker.cpp
     src/managers/shadermanager/ShaderManager.cpp
     src/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
-    src/managers/physicsmanager/rigidbodies/RigidBodyFactory.cpp
+    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/factories/RigidBodyFactory.cpp
     src/managers/testmanager/TestManager.cpp
 )
 
@@ -86,7 +87,7 @@ enable_testing()
 add_executable(physics-tests
     src/test_runner.cpp
     src/managers/testmanager/TestManager.cpp
-    src/rigidbody/RigidBodySystem.cpp
+    src/components/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
@@ -110,7 +111,7 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 add_executable(legacy-physics-tests
     src/test_physics_systems.cpp
     src/managers/testmanager/TestManager.cpp
-    src/rigidbody/RigidBodySystem.cpp
+    src/components/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp

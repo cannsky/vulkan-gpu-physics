@@ -3,6 +3,7 @@
 #include "../particlemanager/ParticleManager.h"
 #include "../collisionmanager/CollisionManager.h"
 #include "workers/PhysicsLayerWorker.h"
+#include "workers/RigidBodyWorker.h"
 
 PhysicsManager& PhysicsManager::getInstance() {
     static PhysicsManager instance;
@@ -29,6 +30,12 @@ bool PhysicsManager::initialize() {
             return false;
         }
         
+        // Initialize rigidbody worker
+        rigidBodyWorker = std::make_shared<RigidBodyWorker>();
+        if (!rigidBodyWorker->initialize()) {
+            return false;
+        }
+        
         initialized = true;
         return true;
     } catch (const std::exception& e) {
@@ -38,6 +45,11 @@ bool PhysicsManager::initialize() {
 }
 
 void PhysicsManager::cleanup() {
+    if (rigidBodyWorker) {
+        rigidBodyWorker->cleanup();
+        rigidBodyWorker.reset();
+    }
+    
     if (layerWorker) {
         layerWorker->cleanup();
         layerWorker.reset();
@@ -59,6 +71,11 @@ void PhysicsManager::updatePhysics(float deltaTime) {
         return;
     }
     
+    // Update rigidbody system
+    if (rigidBodyWorker) {
+        rigidBodyWorker->updatePhysics(deltaTime);
+    }
+    
     // Update particle system
     auto particleManager = getParticleManager();
     if (particleManager && particleManager->isInitialized()) {
@@ -78,6 +95,10 @@ void PhysicsManager::setGravity(float x, float y, float z) {
     gravity.z = z;
     
     // Propagate to subsystems
+    if (rigidBodyWorker) {
+        rigidBodyWorker->setGravity(x, y, z);
+    }
+    
     auto particleManager = getParticleManager();
     if (particleManager && particleManager->isInitialized()) {
         particleManager->setGravity(x, y, z);
