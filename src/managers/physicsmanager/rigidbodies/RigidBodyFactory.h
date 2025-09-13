@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../rigidbody/RigidBody.h"
-#include "../LayerSystem.h"
+#include "../workers/PhysicsLayerWorker.h"
 #include <memory>
 
 /**
@@ -14,15 +14,15 @@ public:
     
     // Basic shape creation
     std::unique_ptr<RigidBody> createSphere(float x, float y, float z, float radius, 
-                                          float mass = 1.0f, LayerSystem::LayerId layer = LayerSystem::DEFAULT_LAYER);
+                                          float mass = 1.0f, PhysicsLayerWorker::LayerId layer = PhysicsLayerWorker::DEFAULT_LAYER);
     
     std::unique_ptr<RigidBody> createBox(float x, float y, float z, float width, float height, float depth, 
-                                       float mass = 1.0f, LayerSystem::LayerId layer = LayerSystem::DEFAULT_LAYER);
+                                       float mass = 1.0f, PhysicsLayerWorker::LayerId layer = PhysicsLayerWorker::DEFAULT_LAYER);
     
-    std::unique_ptr<RigidBody> createStaticPlane(float y = 0.0f, LayerSystem::LayerId layer = LayerSystem::DEFAULT_LAYER);
+    std::unique_ptr<RigidBody> createStaticPlane(float y = 0.0f, PhysicsLayerWorker::LayerId layer = PhysicsLayerWorker::DEFAULT_LAYER);
     
     // Advanced creation with custom properties
-    std::unique_ptr<RigidBody> createCustomRigidBody(const RigidBody& template_body, LayerSystem::LayerId layer = LayerSystem::DEFAULT_LAYER);
+    std::unique_ptr<RigidBody> createCustomRigidBody(const RigidBody& template_body, PhysicsLayerWorker::LayerId layer = PhysicsLayerWorker::DEFAULT_LAYER);
     
     // Configuration
     void setDefaultMaterial(float restitution, float friction);

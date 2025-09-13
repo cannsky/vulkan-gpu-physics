@@ -16,10 +16,10 @@ add_executable(tulpar-physics
     src/vulkan/VulkanInstance.cpp
     src/vulkan/VulkanDevice.cpp
     src/vulkan/VulkanCommandPool.cpp
-    src/physics/VulkanContext.cpp
-    src/physics/PhysicsEngine.cpp
-    src/physics/components/BufferManager.cpp
-    src/physics/components/ComputePipeline.cpp
+    src/vulkan/VulkanContext.cpp
+    src/components/physics/PhysicsEngine.cpp
+    src/vulkan/physics/BufferManager.cpp
+    src/vulkan/physics/ComputePipeline.cpp
     src/rigidbody/RigidBodySystem.cpp
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
@@ -31,7 +31,7 @@ add_executable(tulpar-physics
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
     src/managers/collisionmanager/workers/GPUBufferWorker.cpp
     src/managers/shadermanager/ShaderManager.cpp
-    src/managers/physicsmanager/LayerSystem.cpp
+    src/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/physicsmanager/rigidbodies/RigidBodyFactory.cpp
     src/managers/testmanager/TestManager.cpp
 )

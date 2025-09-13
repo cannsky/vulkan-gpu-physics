@@ -8,7 +8,7 @@ RigidBodyFactory& RigidBodyFactory::getInstance() {
 }
 
 std::unique_ptr<RigidBody> RigidBodyFactory::createSphere(float x, float y, float z, float radius, 
-                                                        float mass, LayerSystem::LayerId layer) {
+                                                        float mass, PhysicsLayerWorker::LayerId layer) {
     auto body = std::make_unique<RigidBody>();
     std::memset(body.get(), 0, sizeof(RigidBody));
     
@@ -40,7 +40,7 @@ std::unique_ptr<RigidBody> RigidBodyFactory::createSphere(float x, float y, floa
 }
 
 std::unique_ptr<RigidBody> RigidBodyFactory::createBox(float x, float y, float z, float width, float height, float depth, 
-                                                     float mass, LayerSystem::LayerId layer) {
+                                                     float mass, PhysicsLayerWorker::LayerId layer) {
     auto body = std::make_unique<RigidBody>();
     std::memset(body.get(), 0, sizeof(RigidBody));
     
@@ -73,7 +73,7 @@ std::unique_ptr<RigidBody> RigidBodyFactory::createBox(float x, float y, float z
     return body;
 }
 
-std::unique_ptr<RigidBody> RigidBodyFactory::createStaticPlane(float y, LayerSystem::LayerId layer) {
+std::unique_ptr<RigidBody> RigidBodyFactory::createStaticPlane(float y, PhysicsLayerWorker::LayerId layer) {
     auto body = std::make_unique<RigidBody>();
     std::memset(body.get(), 0, sizeof(RigidBody));
     
@@ -113,7 +113,7 @@ std::unique_ptr<RigidBody> RigidBodyFactory::createStaticPlane(float y, LayerSys
     return body;
 }
 
-std::unique_ptr<RigidBody> RigidBodyFactory::createCustomRigidBody(const RigidBody& template_body, LayerSystem::LayerId layer) {
+std::unique_ptr<RigidBody> RigidBodyFactory::createCustomRigidBody(const RigidBody& template_body, PhysicsLayerWorker::LayerId layer) {
     auto body = std::make_unique<RigidBody>(template_body);
     body->layer = layer;
     return body;

@@ -2,7 +2,7 @@
 #include "../../vulkan/VulkanInstance.h"
 #include "../../vulkan/VulkanDevice.h"
 #include "../../vulkan/VulkanCommandPool.h"
-#include "../../physics/VulkanContext.h"
+#include "../../vulkan/VulkanContext.h"
 #include <stdexcept>
 
 VulkanManager& VulkanManager::getInstance() {

@@ -1,5 +1,5 @@
 #include "GPUBufferWorker.h"
-#include "../../../physics/VulkanContext.h"
+#include "../../../vulkan/VulkanContext.h"
 #include "../../../physics/components/BufferManager.h"
 
 GPUBufferWorker::GPUBufferWorker(std::shared_ptr<VulkanContext> context, std::shared_ptr<BufferManager> bufferManager)
