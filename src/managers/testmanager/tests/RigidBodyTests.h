@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../../rigidbody/RigidBodySystem.h"
+#include "../../../components/rigidbody/RigidBodySystem.h"
 #include "../../logmanager/Logger.h"
 #include <cmath>
 

@@ -2,7 +2,7 @@
 
 #include "../Test.h"
 #include "../../collisionmanager/CollisionManager.h"
-#include "../../../rigidbody/RigidBody.h"
+#include "../../../components/rigidbody/RigidBody.h"
 #include "../../logmanager/Logger.h"
 #include <cmath>
 

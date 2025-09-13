@@ -6,7 +6,7 @@
 #include "managers/vulkanmanager/VulkanManager.h"
 #include "managers/physicsmanager/PhysicsManager.h"
 #include "managers/particlemanager/ParticleManager.h"
-#include "managers/physicsmanager/rigidbodies/RigidBodyFactory.h"
+#include "factories/RigidBodyFactory.h"
 #include "managers/physicsmanager/workers/PhysicsLayerWorker.h"
 #include "managers/logmanager/Logger.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../rigidbody/RigidBody.h"
-#include "../workers/PhysicsLayerWorker.h"
+#include "../components/rigidbody/RigidBody.h"
+#include "../managers/physicsmanager/workers/PhysicsLayerWorker.h"
 #include <memory>
 
 /**
