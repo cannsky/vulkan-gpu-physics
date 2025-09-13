@@ -2,7 +2,7 @@
 
 #include "framework/Test.h"
 #include "rigidbody/RigidBodySystem.h"
-#include "logger/Logger.h"
+#include "managers/logmanager/Logger.h"
 #include <cmath>
 
 class RigidBodyCreationTest : public Test {

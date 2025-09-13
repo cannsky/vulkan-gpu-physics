@@ -1,78 +1,14 @@
-#include "CollisionSystem.h"
-#include "../physics/components/BufferManager.h"
-#include "../physics/VulkanContext.h"
-#include "../rigidbody/RigidBodySystem.h"
-#include <iostream>
-#include <cstring>
+#include "DetectCollisionWorker.h"
+#include "../../../rigidbody/RigidBodySystem.h"
 #include <cmath>
 #include <cfloat>
 #include <algorithm>
 
-CollisionSystem::CollisionSystem(std::shared_ptr<VulkanContext> context, std::shared_ptr<BufferManager> bufferManager)
-    : vulkanContext(context), bufferManager(bufferManager), maxContacts(0), contactCount(0) {
-}
-
-CollisionSystem::~CollisionSystem() {
-    cleanup();
-}
-
-bool CollisionSystem::initialize(uint32_t maxContacts) {
-    this->maxContacts = maxContacts;
-    contacts.reserve(maxContacts);
-    
-    std::cout << "CollisionSystem initialized with capacity for " << maxContacts << " contacts" << std::endl;
-    return true;
-}
-
-void CollisionSystem::cleanup() {
-    contacts.clear();
-    collisionPairs.clear();
-    
-    // Clean up GPU resources
-    if (contactBuffer != VK_NULL_HANDLE) {
-        // Cleanup would be handled by BufferManager or VulkanContext
-    }
-}
-
-void CollisionSystem::updateBroadPhase(const std::vector<RigidBody>& rigidBodies) {
-    // Simple O(n²) broad phase for now
-    // In production, use spatial partitioning (BVH, grid, etc.)
-    
-    collisionPairs.clear();
-    
-    for (size_t i = 0; i < rigidBodies.size(); ++i) {
-        for (size_t j = i + 1; j < rigidBodies.size(); ++j) {
-            const RigidBody& bodyA = rigidBodies[i];
-            const RigidBody& bodyB = rigidBodies[j];
-            
-            // Skip if both bodies are static
-            if (bodyA.isStatic && bodyB.isStatic) {
-                continue;
-            }
-            
-            // Simple AABB check for broad phase
-            float dx = bodyA.position[0] - bodyB.position[0];
-            float dy = bodyA.position[1] - bodyB.position[1];
-            float dz = bodyA.position[2] - bodyB.position[2];
-            float distSq = dx * dx + dy * dy + dz * dz;
-            
-            // Conservative bounding sphere check
-            float maxRadiusA = std::max({bodyA.shapeData[0], bodyA.shapeData[1], bodyA.shapeData[2]});
-            float maxRadiusB = std::max({bodyB.shapeData[0], bodyB.shapeData[1], bodyB.shapeData[2]});
-            float maxDist = maxRadiusA + maxRadiusB;
-            
-            if (distSq <= maxDist * maxDist) {
-                CollisionPair pair;
-                pair.bodyIdA = static_cast<uint32_t>(i);
-                pair.bodyIdB = static_cast<uint32_t>(j);
-                pair.isActive = 1;
-                collisionPairs.push_back(pair);
-            }
-        }
-    }
-}
-
-void CollisionSystem::detectCollisions(std::shared_ptr<RigidBodySystem> rigidBodySystem) {
+void DetectCollisionWorker::detectCollisions(const std::vector<CollisionPair>& collisionPairs, 
+                                            std::shared_ptr<RigidBodySystem> rigidBodySystem,
+                                            std::vector<Contact>& contacts,
+                                            uint32_t maxContacts,
+                                            uint32_t& contactCount) {
     contacts.clear();
     contactCount = 0;
     
@@ -127,30 +63,7 @@ void CollisionSystem::detectCollisions(std::shared_ptr<RigidBodySystem> rigidBod
     }
 }
 
-void CollisionSystem::resolveContacts(float deltaTime) {
-    // Simple impulse-based resolution
-    // In production, this would run on GPU
-    
-    for (const auto& contact : contacts) {
-        // This is a simplified version - full resolution would handle
-        // angular momentum, friction, and iterative solving
-        std::cout << "Resolving contact between bodies " 
-                  << contact.bodyIdA << " and " << contact.bodyIdB 
-                  << " with penetration " << contact.penetration << std::endl;
-    }
-}
-
-void CollisionSystem::uploadContactsToGPU() {
-    // Upload contact data to GPU buffers for compute shader processing
-    std::cout << "Uploading " << contactCount << " contacts to GPU" << std::endl;
-}
-
-void CollisionSystem::downloadContactsFromGPU() {
-    // Download resolved contact data from GPU
-    std::cout << "Downloading contacts from GPU" << std::endl;
-}
-
-bool CollisionSystem::sphereVsSphere(const RigidBody& bodyA, const RigidBody& bodyB, Contact& contact) {
+bool DetectCollisionWorker::sphereVsSphere(const RigidBody& bodyA, const RigidBody& bodyB, Contact& contact) {
     float dx = bodyA.position[0] - bodyB.position[0];
     float dy = bodyA.position[1] - bodyB.position[1];
     float dz = bodyA.position[2] - bodyB.position[2];
@@ -187,7 +100,7 @@ bool CollisionSystem::sphereVsSphere(const RigidBody& bodyA, const RigidBody& bo
     return true;
 }
 
-bool CollisionSystem::sphereVsBox(const RigidBody& sphere, const RigidBody& box, Contact& contact) {
+bool DetectCollisionWorker::sphereVsBox(const RigidBody& sphere, const RigidBody& box, Contact& contact) {
     // Simplified sphere vs box collision detection
     // For a complete implementation, we'd need to handle rotated boxes
     
@@ -247,7 +160,7 @@ bool CollisionSystem::sphereVsBox(const RigidBody& sphere, const RigidBody& box,
     return true;
 }
 
-bool CollisionSystem::boxVsBox(const RigidBody& bodyA, const RigidBody& bodyB, Contact& contact) {
+bool DetectCollisionWorker::boxVsBox(const RigidBody& bodyA, const RigidBody& bodyB, Contact& contact) {
     // Simplified box vs box collision detection
     // This is a placeholder - full OBB vs OBB collision is complex
     
@@ -289,12 +202,12 @@ bool CollisionSystem::boxVsBox(const RigidBody& bodyA, const RigidBody& bodyB, C
     return true;
 }
 
-float CollisionSystem::combinedRestitution(float restA, float restB) const {
+float DetectCollisionWorker::combinedRestitution(float restA, float restB) const {
     // Average the restitution values
     return (restA + restB) * 0.5f;
 }
 
-float CollisionSystem::combinedFriction(float fricA, float fricB) const {
+float DetectCollisionWorker::combinedFriction(float fricA, float fricB) const {
     // Use geometric mean for friction
     return std::sqrt(fricA * fricB);
 }

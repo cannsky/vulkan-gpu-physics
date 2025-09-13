@@ -8,7 +8,7 @@
 #include "managers/particlemanager/ParticleManager.h"
 #include "managers/physicsmanager/rigidbodies/RigidBodyFactory.h"
 #include "managers/physicsmanager/LayerSystem.h"
-#include "logger/Logger.h"
+#include "managers/logmanager/Logger.h"
 
 int main() {
     // Configure logging system

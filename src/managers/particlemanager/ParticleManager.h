@@ -2,15 +2,18 @@
 
 #include "../BaseManager.h"
 #include "../../physics/Particle.h"
+#include <vulkan/vulkan.h>
 #include <vector>
 #include <memory>
 
 // Forward declarations
-class ParticleSystem;
+class VulkanContext;
+class BufferManager;
 
 /**
  * Manager for particle physics system.
  * Provides singleton access to particle operations.
+ * Integrates all particle system functionality directly.
  */
 class ParticleManager : public BaseManager {
 public:
@@ -34,11 +37,33 @@ public:
     // GPU operations
     void uploadParticlesToGPU();
     void downloadParticlesFromGPU();
+    void updateUniformBuffer(float deltaTime);
 
 private:
     ParticleManager() = default;
     ~ParticleManager() = default;
     
+    // Initialization
+    bool initializeInternal(uint32_t maxParticles = 1024);
+    
+    // Utility functions
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    
     bool initialized = false;
-    std::shared_ptr<ParticleSystem> particleSystem;
+    
+    // Vulkan context
+    std::shared_ptr<VulkanContext> vulkanContext;
+    std::shared_ptr<BufferManager> bufferManager;
+    
+    // Particle data
+    std::vector<Particle> particles;
+    uint32_t maxParticles = 1024;
+    
+    // Uniform buffer object for GPU
+    struct UniformBufferObject {
+        float deltaTime;
+        float gravity[3];
+        uint32_t particleCount;
+    } ubo;
 };
