@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <cstdint>
 
 struct Contact {
     float position[3];    // Contact point in world space

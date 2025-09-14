@@ -1,9 +1,8 @@
 #include "CollisionManager.h"
-#include "../vulkanmanager/VulkanManager.h"
 #include "workers/BroadPhaseWorker.h"
 #include "workers/DetectCollisionWorker.h"
 #include "workers/ContactResolverWorker.h"
-#include "workers/GPUBufferWorker.h"
+// #include "workers/GPUBufferWorker.h" // Optional GPU functionality
 
 CollisionManager& CollisionManager::getInstance() {
     static CollisionManager instance;
@@ -41,10 +40,11 @@ bool CollisionManager::initialize() {
 }
 
 void CollisionManager::cleanup() {
-    if (gpuBufferWorker) {
-        gpuBufferWorker->cleanup();
-        gpuBufferWorker.reset();
-    }
+    // GPU functionality commented out for non-Vulkan builds
+    // if (gpuBufferWorker) {
+    //     gpuBufferWorker->cleanup();
+    //     gpuBufferWorker.reset();
+    // }
     
     contactResolverWorker.reset();
     detectCollisionWorker.reset();
@@ -102,15 +102,17 @@ uint32_t CollisionManager::getCollisionPairCount() const {
 }
 
 void CollisionManager::uploadContactsToGPU() {
-    if (!gpuBufferWorker) {
-        return;
-    }
-    gpuBufferWorker->uploadContactsToGPU(contactCount);
+    // GPU functionality commented out for non-Vulkan builds
+    // if (!gpuBufferWorker) {
+    //     return;
+    // }
+    // gpuBufferWorker->uploadContactsToGPU(contactCount);
 }
 
 void CollisionManager::downloadContactsFromGPU() {
-    if (!gpuBufferWorker) {
-        return;
-    }
-    gpuBufferWorker->downloadContactsFromGPU();
+    // GPU functionality commented out for non-Vulkan builds
+    // if (!gpuBufferWorker) {
+    //     return;
+    // }
+    // gpuBufferWorker->downloadContactsFromGPU();
 }
