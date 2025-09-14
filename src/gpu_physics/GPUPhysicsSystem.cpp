@@ -74,7 +74,7 @@ void GPUPhysicsSystem::cleanup() {
 
 bool GPUPhysicsSystem::addParticle(const Particle& particle) {
     if (particles.size() >= maxParticles) {
-        LOG_WARNING(LogCategory::PARTICLES, "Cannot add particle: maximum capacity reached");
+        LOG_WARN(LogCategory::PARTICLES, "Cannot add particle: maximum capacity reached");
         return false;
     }
     
