@@ -4,8 +4,31 @@ project(titanium-gpu-physics VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find required packages
-find_package(Vulkan REQUIRED)
+# Find optional packages
+find_package(Vulkan)
+
+# Check if Vulkan is available
+if(Vulkan_FOUND)
+    message(STATUS "Vulkan found - GPU physics will be available")
+    add_compile_definitions(VULKAN_AVAILABLE)
+    set(VULKAN_SOURCES
+        src/gpu_physics/GPUPhysicsSystem.cpp
+        src/components/vulkan/VulkanInstance.cpp
+        src/components/vulkan/VulkanDevice.cpp
+        src/components/vulkan/VulkanCommandPool.cpp
+        src/components/vulkan/VulkanContext.cpp
+        src/components/vulkan/physics/BufferManager.cpp
+        src/components/vulkan/physics/ComputePipeline.cpp
+        src/managers/vulkanmanager/VulkanManager.cpp
+    )
+    set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
+    set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
+else()
+    message(STATUS "Vulkan not found - building CPU-only physics system")
+    set(VULKAN_SOURCES "")
+    set(VULKAN_INCLUDE_DIRS "")
+    set(VULKAN_LIBRARIES "")
+endif()
 
 # Create directories
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
@@ -15,71 +38,51 @@ add_executable(titanium-gpu-physics
     src/main.cpp
     # New hybrid physics system
     src/physics_engine.cpp
-    src/gpu_physics/GPUPhysicsSystem.cpp
     src/cpu_physics/CPUPhysicsSystem.cpp
-    # Vulkan components
-    src/components/vulkan/VulkanInstance.cpp
-    src/components/vulkan/VulkanDevice.cpp
-    src/components/vulkan/VulkanCommandPool.cpp
-    src/components/vulkan/VulkanContext.cpp
-    src/components/vulkan/physics/BufferManager.cpp
-    src/components/vulkan/physics/ComputePipeline.cpp
-    # Legacy physics system (for compatibility)
-    src/components/physics/PhysicsEngine.cpp
-    # Managers
+    ${VULKAN_SOURCES}
+    # Managers (CPU-only compatible)
     src/managers/logmanager/Logger.cpp
-    src/managers/vulkanmanager/VulkanManager.cpp
-    src/managers/physicsmanager/PhysicsManager.cpp
-    src/managers/particlemanager/ParticleManager.cpp
-    src/managers/collisionmanager/CollisionManager.cpp
-    src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
-    src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
-    src/managers/collisionmanager/workers/ContactResolverWorker.cpp
-    src/managers/collisionmanager/workers/GPUBufferWorker.cpp
-    src/managers/shadermanager/ShaderManager.cpp
-    src/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
-    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
-    src/factories/RigidBodyFactory.cpp
-    src/components/tests/TestManager.cpp
 )
 
 # Include directories
 target_include_directories(titanium-gpu-physics PRIVATE
     src
-    ${Vulkan_INCLUDE_DIRS}
+    ${VULKAN_INCLUDE_DIRS}
 )
 
 # Link libraries
 target_link_libraries(titanium-gpu-physics
-    ${Vulkan_LIBRARIES}
+    ${VULKAN_LIBRARIES}
 )
 
-# Compile shaders
-find_program(GLSLANGVALIDATOR glslangValidator REQUIRED)
+# Compile shaders (only if Vulkan is available)
+if(Vulkan_FOUND)
+    find_program(GLSLANGVALIDATOR glslangValidator REQUIRED)
 
-set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/components/shaders)
-set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/components/shaders)
+    set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 
-file(GLOB SHADERS
-    ${SHADER_SOURCE_DIR}/*.comp
-    ${SHADER_SOURCE_DIR}/*.vert
-    ${SHADER_SOURCE_DIR}/*.frag
-)
-
-foreach(SHADER ${SHADERS})
-    get_filename_component(FILENAME ${SHADER} NAME)
-    set(SPV "${SHADER_BINARY_DIR}/${FILENAME}.spv")
-    add_custom_command(
-        OUTPUT ${SPV}
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${SHADER_BINARY_DIR}"
-        COMMAND ${GLSLANGVALIDATOR} -V ${SHADER} -o ${SPV}
-        DEPENDS ${SHADER}
+    file(GLOB SHADERS
+        ${SHADER_SOURCE_DIR}/*.comp
+        ${SHADER_SOURCE_DIR}/*.vert
+        ${SHADER_SOURCE_DIR}/*.frag
     )
-    list(APPEND SPV_SHADERS ${SPV})
-endforeach()
 
-add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
-add_dependencies(titanium-gpu-physics shaders)
+    foreach(SHADER ${SHADERS})
+        get_filename_component(FILENAME ${SHADER} NAME)
+        set(SPV "${SHADER_BINARY_DIR}/${FILENAME}.spv")
+        add_custom_command(
+            OUTPUT ${SPV}
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${SHADER_BINARY_DIR}"
+            COMMAND ${GLSLANGVALIDATOR} -V ${SHADER} -o ${SPV}
+            DEPENDS ${SHADER}
+        )
+        list(APPEND SPV_SHADERS ${SPV})
+    endforeach()
+
+    add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
+    add_dependencies(titanium-gpu-physics shaders)
+endif()
 
 # Set output directory for shaders
 set_target_properties(titanium-gpu-physics PROPERTIES
@@ -108,11 +111,11 @@ add_executable(physics-tests
 target_include_directories(physics-tests PRIVATE
     src
     src/components/tests/tests
-    ${Vulkan_INCLUDE_DIRS}
+    ${VULKAN_INCLUDE_DIRS}
 )
 
 target_link_libraries(physics-tests
-    ${Vulkan_LIBRARIES}
+    ${VULKAN_LIBRARIES}
 )
 
 # Register tests with CTest
@@ -137,11 +140,11 @@ add_executable(legacy-physics-tests
 target_include_directories(legacy-physics-tests PRIVATE
     src
     src/components/tests/tests
-    ${Vulkan_INCLUDE_DIRS}
+    ${VULKAN_INCLUDE_DIRS}
 )
 
 target_link_libraries(legacy-physics-tests
-    ${Vulkan_LIBRARIES}
+    ${VULKAN_LIBRARIES}
 )
 
 # Register legacy tests with CTest

@@ -4,7 +4,10 @@
 #include <thread>
 #include <random>
 #include "physics_engine.h"
+#include "cpu_physics/CPUPhysicsSystem.h"
+#ifdef VULKAN_AVAILABLE
 #include "managers/vulkanmanager/VulkanManager.h"
+#endif
 #include "managers/logmanager/Logger.h"
 
 int main() {
@@ -24,6 +27,7 @@ int main() {
     
     // Try to initialize Vulkan for GPU physics (optional)
     bool vulkanAvailable = false;
+#ifdef VULKAN_AVAILABLE
     auto& vulkanManager = VulkanManager::getInstance();
     if (vulkanManager.initialize()) {
         vulkanAvailable = true;
@@ -31,6 +35,9 @@ int main() {
     } else {
         std::cout << "Vulkan not available - using CPU-only physics" << std::endl;
     }
+#else
+    std::cout << "Vulkan not compiled - using CPU-only physics" << std::endl;
+#endif
     
     // Initialize Titanium Physics Engine
     PhysicsEngine physicsEngine;
@@ -40,9 +47,11 @@ int main() {
     
     if (!physicsEngine.initialize(maxParticles, maxRigidBodies)) {
         std::cerr << "Failed to initialize Titanium Physics Engine!" << std::endl;
+#ifdef VULKAN_AVAILABLE
         if (vulkanAvailable) {
             vulkanManager.cleanup();
         }
+#endif
         return -1;
     }
     
@@ -196,9 +205,11 @@ int main() {
     
     // Cleanup
     physicsEngine.cleanup();
+#ifdef VULKAN_AVAILABLE
     if (vulkanAvailable) {
         vulkanManager.cleanup();
     }
+#endif
     
     std::cout << "Titanium Physics simulation ended." << std::endl;
     return 0;
