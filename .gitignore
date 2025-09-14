@@ -15,7 +15,7 @@ Makefile
 # Compiled binaries
 *.exe
 *.out
-tulpar-physics
+titanium-gpu-physics
 physics-tests
 legacy-physics-tests
 
