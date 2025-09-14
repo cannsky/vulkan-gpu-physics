@@ -4,7 +4,7 @@
 #include <thread>
 #include <random>
 #include "physics_engine.h"
-#include "cpu_physics/CPUPhysicsSystem.h"
+#include "cpu_physics/CPUPhysicsEngine.h"
 #ifdef VULKAN_AVAILABLE
 #include "managers/vulkanmanager/VulkanManager.h"
 #endif

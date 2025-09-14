@@ -1,10 +1,10 @@
 #include "physics_engine.h"
-#include "cpu_physics/CPUPhysicsSystem.h"
+#include "cpu_physics/CPUPhysicsEngine.h"
 #include "managers/logmanager/Logger.h"
 
 // Only include GPU physics if Vulkan is available
 #ifdef VULKAN_AVAILABLE
-#include "gpu_physics/GPUPhysicsSystem.h"
+#include "gpu_physics/GPUPhysicsEngine.h"
 #include "managers/vulkanmanager/VulkanManager.h"
 #endif
 
@@ -30,7 +30,7 @@ bool PhysicsEngine::initialize(uint32_t maxParticles, uint32_t maxRigidBodies) {
     // Initialize GPU Physics System for particles/fluids
     auto& vulkanManager = VulkanManager::getInstance();
     if (vulkanManager.isInitialized()) {
-        gpuPhysics = std::make_unique<gpu_physics::GPUPhysicsSystem>(vulkanManager.getContext());
+        gpuPhysics = std::make_unique<gpu_physics::GPUPhysicsEngine>(vulkanManager.getContext());
         if (!gpuPhysics->initialize(maxParticles)) {
             LOG_ERROR(LogCategory::PHYSICS, "Failed to initialize GPU physics system");
             return false;
@@ -44,7 +44,7 @@ bool PhysicsEngine::initialize(uint32_t maxParticles, uint32_t maxRigidBodies) {
 #endif
     
     // Initialize CPU Physics System for rigidbodies (ECS-based)
-    cpuPhysics = std::make_unique<cpu_physics::CPUPhysicsSystem>();
+    cpuPhysics = std::make_unique<cpu_physics::CPUPhysicsEngine>();
     if (!cpuPhysics->initialize(maxRigidBodies)) {
         LOG_ERROR(LogCategory::PHYSICS, "Failed to initialize CPU physics system");
         return false;

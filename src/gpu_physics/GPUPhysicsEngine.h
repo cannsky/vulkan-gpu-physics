@@ -13,13 +13,13 @@ class ComputePipeline;
 namespace gpu_physics {
 
 /**
- * GPU Physics System - Handles particle and fluid simulations
+ * GPU Physics Engine - Handles particle and fluid simulations
  * Uses Vulkan compute shaders for high-performance GPU-accelerated physics
  */
-class GPUPhysicsSystem {
+class GPUPhysicsEngine {
 public:
-    GPUPhysicsSystem(std::shared_ptr<VulkanContext> context);
-    ~GPUPhysicsSystem();
+    GPUPhysicsEngine(std::shared_ptr<VulkanContext> context);
+    ~GPUPhysicsEngine();
     
     bool initialize(uint32_t maxParticles = 1024);
     void cleanup();

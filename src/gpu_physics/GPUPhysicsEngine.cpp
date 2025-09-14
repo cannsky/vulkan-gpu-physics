@@ -1,4 +1,4 @@
-#include "GPUPhysicsSystem.h"
+#include "GPUPhysicsEngine.h"
 #include "../components/vulkan/VulkanContext.h"
 #include "../components/vulkan/physics/BufferManager.h"
 #include "../components/vulkan/physics/ComputePipeline.h"
@@ -8,16 +8,16 @@
 
 namespace gpu_physics {
 
-GPUPhysicsSystem::GPUPhysicsSystem(std::shared_ptr<VulkanContext> context)
+GPUPhysicsEngine::GPUPhysicsEngine(std::shared_ptr<VulkanContext> context)
     : vulkanContext(context), maxParticles(0) {
     LOG_INFO(LogCategory::PHYSICS, "Creating GPU Physics System");
 }
 
-GPUPhysicsSystem::~GPUPhysicsSystem() {
+GPUPhysicsEngine::~GPUPhysicsEngine() {
     cleanup();
 }
 
-bool GPUPhysicsSystem::initialize(uint32_t maxParticles) {
+bool GPUPhysicsEngine::initialize(uint32_t maxParticles) {
     this->maxParticles = maxParticles;
     particles.reserve(maxParticles);
     
@@ -59,7 +59,7 @@ bool GPUPhysicsSystem::initialize(uint32_t maxParticles) {
     return true;
 }
 
-void GPUPhysicsSystem::cleanup() {
+void GPUPhysicsEngine::cleanup() {
     if (computeCommandBuffer != VK_NULL_HANDLE && vulkanContext) {
         vkFreeCommandBuffers(vulkanContext->getDevice(), vulkanContext->getCommandPool(), 1, &computeCommandBuffer);
         computeCommandBuffer = VK_NULL_HANDLE;
@@ -72,7 +72,7 @@ void GPUPhysicsSystem::cleanup() {
     LOG_INFO(LogCategory::PHYSICS, "GPU Physics System cleanup complete");
 }
 
-bool GPUPhysicsSystem::addParticle(const Particle& particle) {
+bool GPUPhysicsEngine::addParticle(const Particle& particle) {
     if (particles.size() >= maxParticles) {
         LOG_WARN(LogCategory::PARTICLES, "Cannot add particle: maximum capacity reached");
         return false;
@@ -82,7 +82,7 @@ bool GPUPhysicsSystem::addParticle(const Particle& particle) {
     return true;
 }
 
-bool GPUPhysicsSystem::addParticle(float x, float y, float z, float vx, float vy, float vz, float mass) {
+bool GPUPhysicsEngine::addParticle(float x, float y, float z, float vx, float vy, float vz, float mass) {
     Particle particle = {};
     particle.position[0] = x;
     particle.position[1] = y;
@@ -95,15 +95,15 @@ bool GPUPhysicsSystem::addParticle(float x, float y, float z, float vx, float vy
     return addParticle(particle);
 }
 
-std::vector<Particle> GPUPhysicsSystem::getParticles() const {
+std::vector<Particle> GPUPhysicsEngine::getParticles() const {
     return particles;
 }
 
-size_t GPUPhysicsSystem::getParticleCount() const {
+size_t GPUPhysicsEngine::getParticleCount() const {
     return particles.size();
 }
 
-void GPUPhysicsSystem::updatePhysics(float deltaTime) {
+void GPUPhysicsEngine::updatePhysics(float deltaTime) {
     if (particles.empty() || !vulkanContext || !computePipeline) {
         return;
     }
@@ -127,7 +127,7 @@ void GPUPhysicsSystem::updatePhysics(float deltaTime) {
     downloadParticlesFromGPU();
 }
 
-void GPUPhysicsSystem::setGravity(float x, float y, float z) {
+void GPUPhysicsEngine::setGravity(float x, float y, float z) {
     gravity.x = x;
     gravity.y = y;
     gravity.z = z;
@@ -136,7 +136,7 @@ void GPUPhysicsSystem::setGravity(float x, float y, float z) {
              std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")");
 }
 
-void GPUPhysicsSystem::uploadParticlesToGPU() {
+void GPUPhysicsEngine::uploadParticlesToGPU() {
     if (!bufferManager || particles.empty()) {
         return;
     }
@@ -146,7 +146,7 @@ void GPUPhysicsSystem::uploadParticlesToGPU() {
     LOG_PHYSICS_INFO("Uploading " + std::to_string(particles.size()) + " particles to GPU");
 }
 
-void GPUPhysicsSystem::downloadParticlesFromGPU() {
+void GPUPhysicsEngine::downloadParticlesFromGPU() {
     if (!bufferManager || particles.empty()) {
         return;
     }
@@ -156,7 +156,7 @@ void GPUPhysicsSystem::downloadParticlesFromGPU() {
     LOG_PHYSICS_INFO("Downloading " + std::to_string(particles.size()) + " particles from GPU");
 }
 
-void GPUPhysicsSystem::recordComputeCommandBuffer() {
+void GPUPhysicsEngine::recordComputeCommandBuffer() {
     if (!computePipeline || computeCommandBuffer == VK_NULL_HANDLE) {
         return;
     }

@@ -6,12 +6,12 @@
 // Forward declarations
 #ifdef VULKAN_AVAILABLE
 namespace gpu_physics {
-    class GPUPhysicsSystem;
+    class GPUPhysicsEngine;
 }
 #endif
 
 namespace cpu_physics {
-    class CPUPhysicsSystem;
+    class CPUPhysicsEngine;
     class RigidBodyComponent;
 }
 
@@ -52,17 +52,17 @@ public:
     
     // Subsystem accessors
 #ifdef VULKAN_AVAILABLE
-    gpu_physics::GPUPhysicsSystem* getGPUPhysics() const { return gpuPhysics.get(); }
+    gpu_physics::GPUPhysicsEngine* getGPUPhysics() const { return gpuPhysics.get(); }
 #endif
-    cpu_physics::CPUPhysicsSystem* getCPUPhysics() const { return cpuPhysics.get(); }
+    cpu_physics::CPUPhysicsEngine* getCPUPhysics() const { return cpuPhysics.get(); }
 
 private:
     bool initialized = false;
     
 #ifdef VULKAN_AVAILABLE
-    std::unique_ptr<gpu_physics::GPUPhysicsSystem> gpuPhysics;
+    std::unique_ptr<gpu_physics::GPUPhysicsEngine> gpuPhysics;
 #endif
-    std::unique_ptr<cpu_physics::CPUPhysicsSystem> cpuPhysics;
+    std::unique_ptr<cpu_physics::CPUPhysicsEngine> cpuPhysics;
     
     struct {
         float x = 0.0f;

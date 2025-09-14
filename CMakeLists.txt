@@ -12,7 +12,7 @@ if(Vulkan_FOUND)
     message(STATUS "Vulkan found - GPU physics will be available")
     add_compile_definitions(VULKAN_AVAILABLE)
     set(VULKAN_SOURCES
-        src/gpu_physics/GPUPhysicsSystem.cpp
+        src/gpu_physics/GPUPhysicsEngine.cpp
         src/components/vulkan/VulkanInstance.cpp
         src/components/vulkan/VulkanDevice.cpp
         src/components/vulkan/VulkanCommandPool.cpp
@@ -38,7 +38,12 @@ add_executable(titanium-gpu-physics
     src/main.cpp
     # New hybrid physics system
     src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/cpu_physics/CPUPhysicsEngine.cpp
+    # ECS Architecture
+    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/factories/rigidbody_component_factory.cpp
+    src/cpu_physics/factories/rigidbody_entity_factory.cpp
+    src/cpu_physics/systems/cpu_physics_collision_system.cpp
     ${VULKAN_SOURCES}
     # Managers (CPU-only compatible)
     src/managers/logmanager/Logger.cpp
@@ -99,7 +104,7 @@ add_executable(physics-tests
     src/components/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
     src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/cpu_physics/CPUPhysicsEngine.cpp
     # Workers
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
@@ -128,7 +133,7 @@ add_executable(legacy-physics-tests
     src/components/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
     src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/cpu_physics/CPUPhysicsEngine.cpp
     # Workers
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
@@ -154,7 +159,7 @@ add_test(NAME LegacyPhysicsTests COMMAND legacy-physics-tests)
 add_executable(test-titanium-physics
     src/test_titanium_physics.cpp
     src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/cpu_physics/CPUPhysicsEngine.cpp
     src/managers/logmanager/Logger.cpp
 )
 
@@ -169,7 +174,7 @@ add_test(NAME TitaniumPhysicsTest COMMAND test-titanium-physics)
 add_executable(titanium-demo-cpu
     src/main_cpu_only.cpp
     src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/cpu_physics/CPUPhysicsEngine.cpp
     src/managers/logmanager/Logger.cpp
 )
 

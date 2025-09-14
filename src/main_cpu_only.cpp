@@ -5,7 +5,7 @@
 #include <random>
 #include <iomanip>
 #include "physics_engine.h"
-#include "cpu_physics/CPUPhysicsSystem.h"
+#include "cpu_physics/CPUPhysicsEngine.h"
 #include "managers/logmanager/Logger.h"
 
 int main() {
