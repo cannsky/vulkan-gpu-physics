@@ -10,16 +10,23 @@ find_package(Vulkan REQUIRED)
 # Create directories
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 
-# Add executable
+# Add executable with new titanium-physics hybrid architecture
 add_executable(titanium-gpu-physics
     src/main.cpp
+    # New hybrid physics system
+    src/physics_engine.cpp
+    src/gpu_physics/GPUPhysicsSystem.cpp
+    src/cpu_physics/CPUPhysicsSystem.cpp
+    # Vulkan components
     src/components/vulkan/VulkanInstance.cpp
     src/components/vulkan/VulkanDevice.cpp
     src/components/vulkan/VulkanCommandPool.cpp
     src/components/vulkan/VulkanContext.cpp
-    src/components/physics/PhysicsEngine.cpp
     src/components/vulkan/physics/BufferManager.cpp
     src/components/vulkan/physics/ComputePipeline.cpp
+    # Legacy physics system (for compatibility)
+    src/components/physics/PhysicsEngine.cpp
+    # Managers
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
     src/managers/physicsmanager/PhysicsManager.cpp
@@ -87,6 +94,10 @@ add_executable(physics-tests
     src/test_runner.cpp
     src/components/tests/TestManager.cpp
     src/components/rigidbody/RigidBodySystem.cpp
+    # New hybrid physics system
+    src/physics_engine.cpp
+    src/cpu_physics/CPUPhysicsSystem.cpp
+    # Workers
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
@@ -112,6 +123,10 @@ add_executable(legacy-physics-tests
     src/test_physics_systems.cpp
     src/components/tests/TestManager.cpp
     src/components/rigidbody/RigidBodySystem.cpp
+    # New hybrid physics system
+    src/physics_engine.cpp
+    src/cpu_physics/CPUPhysicsSystem.cpp
+    # Workers
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
@@ -131,3 +146,18 @@ target_link_libraries(legacy-physics-tests
 
 # Register legacy tests with CTest
 add_test(NAME LegacyPhysicsTests COMMAND legacy-physics-tests)
+
+# Add titanium physics standalone test (CPU only)
+add_executable(test-titanium-physics
+    src/test_titanium_physics.cpp
+    src/physics_engine.cpp
+    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/managers/logmanager/Logger.cpp
+)
+
+target_include_directories(test-titanium-physics PRIVATE
+    src
+)
+
+# Register titanium physics test with CTest
+add_test(NAME TitaniumPhysicsTest COMMAND test-titanium-physics)
