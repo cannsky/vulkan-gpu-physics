@@ -1,10 +1,14 @@
 #include "RigidBodySystem.h"
+#ifdef VULKAN_AVAILABLE
 #include "../vulkan/physics/BufferManager.h"
 #include "../vulkan/VulkanContext.h"
+#endif
 #include <iostream>
 #include <cstring>
 #include <cmath>
 #include <algorithm>
+
+#ifdef VULKAN_AVAILABLE
 
 RigidBodySystem::RigidBodySystem(std::shared_ptr<VulkanContext> context, std::shared_ptr<BufferManager> bufferManager)
     : vulkanContext(context), bufferManager(bufferManager), maxRigidBodies(0), nextId(0) {
@@ -227,3 +231,5 @@ void RigidBodySystem::calculateBoxInertia(RigidBody& body, float width, float he
     body.invInertia[1] = 1.0f / body.inertia[1];
     body.invInertia[2] = 1.0f / body.inertia[2];
 }
+
+#endif // VULKAN_AVAILABLE

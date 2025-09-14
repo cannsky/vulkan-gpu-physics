@@ -105,6 +105,12 @@ add_executable(physics-tests
     # New hybrid physics system
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
+    # ECS Architecture
+    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/factories/rigidbody_component_factory.cpp
+    src/cpu_physics/factories/rigidbody_entity_factory.cpp
+    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    ${VULKAN_SOURCES}
     # Workers
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
@@ -134,6 +140,12 @@ add_executable(legacy-physics-tests
     # New hybrid physics system
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
+    # ECS Architecture
+    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/factories/rigidbody_component_factory.cpp
+    src/cpu_physics/factories/rigidbody_entity_factory.cpp
+    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    ${VULKAN_SOURCES}
     # Workers
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
@@ -160,6 +172,11 @@ add_executable(test-titanium-physics
     src/test_titanium_physics.cpp
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
+    # ECS Architecture
+    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/factories/rigidbody_component_factory.cpp
+    src/cpu_physics/factories/rigidbody_entity_factory.cpp
+    src/cpu_physics/systems/cpu_physics_collision_system.cpp
     src/managers/logmanager/Logger.cpp
 )
 
@@ -175,6 +192,11 @@ add_executable(titanium-demo-cpu
     src/main_cpu_only.cpp
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
+    # ECS Architecture
+    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/factories/rigidbody_component_factory.cpp
+    src/cpu_physics/factories/rigidbody_entity_factory.cpp
+    src/cpu_physics/systems/cpu_physics_collision_system.cpp
     src/managers/logmanager/Logger.cpp
 )
 

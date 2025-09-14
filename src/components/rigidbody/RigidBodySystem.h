@@ -1,13 +1,16 @@
 #pragma once
 
 #include "RigidBody.h"
+#ifdef VULKAN_AVAILABLE
 #include <vulkan/vulkan.h>
+#endif
 #include <vector>
 #include <memory>
 
 class VulkanContext;
 class BufferManager;
 
+#ifdef VULKAN_AVAILABLE
 class RigidBodySystem {
 public:
     RigidBodySystem(std::shared_ptr<VulkanContext> context, std::shared_ptr<BufferManager> bufferManager);
@@ -52,3 +55,31 @@ private:
         float padding[3]; // For alignment
     } ubo;
 };
+#else
+// Stub class for CPU-only builds
+class RigidBodySystem {
+public:
+    RigidBodySystem(void* context = nullptr, void* bufferManager = nullptr) {}
+    ~RigidBodySystem() {}
+    
+    bool initialize(uint32_t maxRigidBodies = 512) { return false; }
+    void cleanup() {}
+    
+    uint32_t createRigidBody(const RigidBody& body) { return 0; }
+    bool removeRigidBody(uint32_t bodyId) { return false; }
+    RigidBody* getRigidBody(uint32_t bodyId) { return nullptr; }
+    
+    void setGravity(float x, float y, float z) {}
+    void updateUniformBuffer(float deltaTime) {}
+    void uploadRigidBodiesToGPU() {}
+    void downloadRigidBodiesFromGPU() {}
+    
+    uint32_t getRigidBodyCount() const { return 0; }
+    uint32_t getMaxRigidBodies() const { return 0; }
+    
+    // Create common shapes
+    uint32_t createSphere(float x, float y, float z, float radius, float mass = 1.0f) { return 0; }
+    uint32_t createBox(float x, float y, float z, float width, float height, float depth, float mass = 1.0f) { return 0; }
+    uint32_t createStaticPlane(float y = 0.0f) { return 0; }
+};
+#endif
