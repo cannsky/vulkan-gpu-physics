@@ -30,7 +30,7 @@ bool PhysicsEngine::initialize(uint32_t maxParticles, uint32_t maxRigidBodies) {
     // Initialize GPU Physics System for particles/fluids
     auto& vulkanManager = VulkanManager::getInstance();
     if (vulkanManager.isInitialized()) {
-        gpuPhysics = std::make_unique<gpu_physics::GPUPhysicsSystem>(vulkanManager.getVulkanContext());
+        gpuPhysics = std::make_unique<gpu_physics::GPUPhysicsSystem>(vulkanManager.getContext());
         if (!gpuPhysics->initialize(maxParticles)) {
             LOG_ERROR(LogCategory::PHYSICS, "Failed to initialize GPU physics system");
             return false;
