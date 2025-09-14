@@ -161,3 +161,18 @@ target_include_directories(test-titanium-physics PRIVATE
 
 # Register titanium physics test with CTest
 add_test(NAME TitaniumPhysicsTest COMMAND test-titanium-physics)
+
+# Add CPU-only demo executable
+add_executable(titanium-demo-cpu
+    src/main_cpu_only.cpp
+    src/physics_engine.cpp
+    src/cpu_physics/CPUPhysicsSystem.cpp
+    src/managers/logmanager/Logger.cpp
+)
+
+target_include_directories(titanium-demo-cpu PRIVATE
+    src
+)
+
+# Register CPU demo test with CTest
+add_test(NAME TitaniumCPUDemo COMMAND titanium-demo-cpu)
