@@ -1,16 +1,14 @@
-#include "PhysicsManager.h"
+#include "GPUPhysicsManager.h"
 #include "../vulkanmanager/VulkanManager.h"
 #include "../particlemanager/ParticleManager.h"
 #include "../collisionmanager/CollisionManager.h"
-#include "workers/PhysicsLayerWorker.h"
-#include "workers/RigidBodyWorker.h"
 
-PhysicsManager& PhysicsManager::getInstance() {
-    static PhysicsManager instance;
+GPUPhysicsManager& GPUPhysicsManager::getInstance() {
+    static GPUPhysicsManager instance;
     return instance;
 }
 
-bool PhysicsManager::initialize() {
+bool GPUPhysicsManager::initialize() {
     if (initialized) {
         return true;
     }
@@ -24,18 +22,6 @@ bool PhysicsManager::initialize() {
             }
         }
         
-        // Initialize physics layer worker
-        layerWorker = std::make_shared<PhysicsLayerWorker>();
-        if (!layerWorker->initialize()) {
-            return false;
-        }
-        
-        // Initialize rigidbody worker
-        rigidBodyWorker = std::make_shared<RigidBodyWorker>();
-        if (!rigidBodyWorker->initialize()) {
-            return false;
-        }
-        
         initialized = true;
         return true;
     } catch (const std::exception& e) {
@@ -44,17 +30,7 @@ bool PhysicsManager::initialize() {
     }
 }
 
-void PhysicsManager::cleanup() {
-    if (rigidBodyWorker) {
-        rigidBodyWorker->cleanup();
-        rigidBodyWorker.reset();
-    }
-    
-    if (layerWorker) {
-        layerWorker->cleanup();
-        layerWorker.reset();
-    }
-    
+void GPUPhysicsManager::cleanup() {
     // Cleanup subsystems
     ParticleManager::getInstance().cleanup();
     CollisionManager::getInstance().cleanup();
@@ -62,18 +38,13 @@ void PhysicsManager::cleanup() {
     initialized = false;
 }
 
-bool PhysicsManager::isInitialized() const {
+bool GPUPhysicsManager::isInitialized() const {
     return initialized;
 }
 
-void PhysicsManager::updatePhysics(float deltaTime) {
+void GPUPhysicsManager::updatePhysics(float deltaTime) {
     if (!initialized) {
         return;
-    }
-    
-    // Update rigidbody system
-    if (rigidBodyWorker) {
-        rigidBodyWorker->updatePhysics(deltaTime);
     }
     
     // Update particle system
@@ -82,33 +53,27 @@ void PhysicsManager::updatePhysics(float deltaTime) {
         particleManager->updatePhysics(deltaTime);
     }
     
-    // Update collision system
+    // Update collision system for fluid interactions
     auto collisionManager = getCollisionManager();
-    if (collisionManager && collisionManager->isInitialized() && rigidBodyWorker) {
-        // First detect collisions with the rigid body worker
-        collisionManager->detectCollisions(rigidBodyWorker);
-        // Then update collisions (resolve contacts)
+    if (collisionManager && collisionManager->isInitialized()) {
+        // Handle fluid-rigidbody interactions (approximations)
         collisionManager->updateCollisions(deltaTime);
     }
 }
 
-void PhysicsManager::setGravity(float x, float y, float z) {
+void GPUPhysicsManager::setGravity(float x, float y, float z) {
     gravity.x = x;
     gravity.y = y;
     gravity.z = z;
     
-    // Propagate to subsystems
-    if (rigidBodyWorker) {
-        rigidBodyWorker->setGravity(x, y, z);
-    }
-    
+    // Propagate to particle system
     auto particleManager = getParticleManager();
     if (particleManager && particleManager->isInitialized()) {
         particleManager->setGravity(x, y, z);
     }
 }
 
-bool PhysicsManager::setMaxParticles(uint32_t newMaxParticles) {
+bool GPUPhysicsManager::setMaxParticles(uint32_t newMaxParticles) {
     if (initialized) {
         // Cannot change after initialization
         return false;
@@ -118,10 +83,10 @@ bool PhysicsManager::setMaxParticles(uint32_t newMaxParticles) {
     return true;
 }
 
-std::shared_ptr<ParticleManager> PhysicsManager::getParticleManager() const {
+std::shared_ptr<ParticleManager> GPUPhysicsManager::getParticleManager() const {
     return std::shared_ptr<ParticleManager>(&ParticleManager::getInstance(), [](ParticleManager*){});
 }
 
-std::shared_ptr<CollisionManager> PhysicsManager::getCollisionManager() const {
+std::shared_ptr<CollisionManager> GPUPhysicsManager::getCollisionManager() const {
     return std::shared_ptr<CollisionManager>(&CollisionManager::getInstance(), [](CollisionManager*){});
 }

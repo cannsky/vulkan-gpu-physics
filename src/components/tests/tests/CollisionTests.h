@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../../managers/collisionmanager/CollisionManager.h"
+#include "../../../gpu_physics/managers/collisionmanager/CollisionManager.h"
 #include "../../rigidbody/RigidBody.h"
 #include "../../../managers/logmanager/Logger.h"
 #include <cmath>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../BaseManager.h"
+#include "../../../managers/BaseManager.h"
 #include "Contact.h"
 #include <vector>
 #include <memory>

@@ -20,6 +20,13 @@ if(Vulkan_FOUND)
         src/gpu_physics/components/vulkan/physics/BufferManager.cpp
         src/gpu_physics/components/vulkan/physics/ComputePipeline.cpp
         src/gpu_physics/managers/vulkanmanager/VulkanManager.cpp
+        src/gpu_physics/managers/physicsmanager/GPUPhysicsManager.cpp
+        src/gpu_physics/managers/particlemanager/ParticleManager.cpp
+        src/gpu_physics/managers/shadermanager/ShaderManager.cpp
+        src/gpu_physics/managers/collisionmanager/CollisionManager.cpp
+        src/gpu_physics/managers/collisionmanager/workers/BroadPhaseWorker.cpp
+        src/gpu_physics/managers/collisionmanager/workers/DetectCollisionWorker.cpp
+        src/gpu_physics/managers/collisionmanager/workers/ContactResolverWorker.cpp
     )
     set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
     set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
@@ -44,6 +51,10 @@ add_executable(titanium-gpu-physics
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    # Physics Managers
+    src/cpu_physics/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     ${VULKAN_SOURCES}
     # Managers (CPU-only compatible)
     src/managers/logmanager/Logger.cpp
@@ -64,7 +75,7 @@ target_link_libraries(titanium-gpu-physics
 if(Vulkan_FOUND)
     find_program(GLSLANGVALIDATOR glslangValidator REQUIRED)
 
-    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/gpu_physics/shaders)
+    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/gpu_physics/components/shaders)
     set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 
     file(GLOB SHADERS
@@ -111,11 +122,9 @@ add_executable(physics-tests
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
     ${VULKAN_SOURCES}
-    # Workers
-    src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
-    src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
-    src/managers/collisionmanager/workers/ContactResolverWorker.cpp
-    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    # CPU Physics Workers
+    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
@@ -146,11 +155,9 @@ add_executable(legacy-physics-tests
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
     ${VULKAN_SOURCES}
-    # Workers
-    src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
-    src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
-    src/managers/collisionmanager/workers/ContactResolverWorker.cpp
-    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    # CPU Physics Workers
+    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
@@ -177,6 +184,10 @@ add_executable(test-titanium-physics
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    # Physics Managers
+    src/cpu_physics/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
@@ -197,6 +208,10 @@ add_executable(titanium-demo-cpu
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    # Physics Managers
+    src/cpu_physics/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 

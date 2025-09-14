@@ -1,4 +1,4 @@
-#include "../../../managers/collisionmanager/CollisionManager.h"
+#include "../../../gpu_physics/managers/collisionmanager/CollisionManager.h"
 #include "../../rigidbody/RigidBodySystem.h"
 #include "../../../managers/logmanager/Logger.h"
 #include "../TestManager.h"

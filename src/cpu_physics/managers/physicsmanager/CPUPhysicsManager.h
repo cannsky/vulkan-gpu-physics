@@ -1,24 +1,20 @@
 #pragma once
 
-#include "../BaseManager.h"
-#include "../../components/physics/Particle.h"
+#include "../../../managers/BaseManager.h"
 #include <vector>
 #include <memory>
 
 // Forward declarations
-class VulkanManager;
-class ParticleManager;
-class CollisionManager;
 class PhysicsLayerWorker;
 class RigidBodyWorker;
 
 /**
- * Central physics management system.
- * Coordinates all physics subsystems using worker-based approach.
+ * CPU-side physics management system.
+ * Handles rigidbodies and collision layers for CPU physics simulation.
  */
-class PhysicsManager : public BaseManager {
+class CPUPhysicsManager : public BaseManager {
 public:
-    static PhysicsManager& getInstance();
+    static CPUPhysicsManager& getInstance();
     
     // BaseManager interface
     bool initialize() override;
@@ -29,24 +25,15 @@ public:
     void updatePhysics(float deltaTime);
     void setGravity(float x, float y, float z);
     
-    // Configuration
-    bool setMaxParticles(uint32_t maxParticles);
-    uint32_t getMaxParticles() const { return maxParticles; }
-    
     // Worker accessors
     std::shared_ptr<PhysicsLayerWorker> getLayerWorker() const { return layerWorker; }
     std::shared_ptr<RigidBodyWorker> getRigidBodyWorker() const { return rigidBodyWorker; }
-    
-    // Subsystem accessors
-    std::shared_ptr<ParticleManager> getParticleManager() const;
-    std::shared_ptr<CollisionManager> getCollisionManager() const;
 
 private:
-    PhysicsManager() = default;
-    ~PhysicsManager() = default;
+    CPUPhysicsManager() = default;
+    ~CPUPhysicsManager() = default;
     
     bool initialized = false;
-    uint32_t maxParticles = 1024;
     
     std::shared_ptr<PhysicsLayerWorker> layerWorker;
     std::shared_ptr<RigidBodyWorker> rigidBodyWorker;
