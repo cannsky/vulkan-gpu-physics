@@ -1,18 +1,67 @@
 # Titanium GPU Physics
 [![Vulkan - Ubuntu](https://github.com/cannsky/vulkan-gpu-physics/actions/workflows/vulkan-ubuntu.yml/badge.svg)](https://github.com/cannsky/vulkan-gpu-physics/actions/workflows/vulkan-ubuntu.yml)
 
-A unified GPU-accelerated physics simulation system using Vulkan compute shaders and C++. Supports both particle-based and rigid body physics with advanced collision detection.
+A hybrid GPU/CPU physics simulation system using Vulkan compute shaders and modern C++. The **Titanium Physics Engine** separates particle/fluid simulations (GPU) from complex rigidbody operations (CPU) using an ECS architecture.
+
+## 🚀 Titanium Physics Engine
+
+The new **Titanium Physics** hybrid architecture provides:
+
+- **🎮 GPU Physics**: High-performance particle and fluid simulations using Vulkan compute shaders
+- **🔧 CPU Physics**: Complex rigidbody dynamics with ECS (Entity Component System) architecture  
+- **🎯 Layer System**: Collision filtering with configurable layer interactions
+- **📦 Box Colliders**: Currently supports box-shaped colliders with AABB collision detection
+- **⚡ Performance**: Each subsystem optimized for its specific use case
+- **🔌 Modular**: Clean separation allowing independent development and testing
+
+> See [TITANIUM_PHYSICS.md](TITANIUM_PHYSICS.md) for detailed documentation of the new hybrid architecture.
 
 ## Features
 
-- **Unified Physics Architecture**: Support for both particles and rigid bodies in a single system
-- **GPU-accelerated physics**: Uses Vulkan compute shaders for high-performance physics calculations
-- **Advanced Collision System**: Broad-phase and narrow-phase collision detection with multiple shape types
-- **Rigid Body Dynamics**: Full 6-DOF rigid body simulation with proper mass properties
-- **Particle Simulation**: Real-time particle physics with gravity, collisions, and dynamics
+- **Hybrid Physics Architecture**: GPU for particles/fluids, CPU for rigidbodies
+- **ECS-based CPU Physics**: Entity Component System for efficient rigidbody management
+- **Advanced Collision System**: Layer-based filtering with box-box collision detection
+- **GPU-accelerated Particles**: Uses Vulkan compute shaders for high-performance physics calculations
 - **Configurable Logging**: Multi-category logging system with performance monitoring
-- **Cross-platform**: Built with modern C++23 and Vulkan for cross-platform compatibility
-- **Modular Design**: Clean separation between physics systems, collision detection, and Vulkan context
+- **Cross-platform**: Built with modern C++23 and optional Vulkan for cross-platform compatibility
+- **Modular Design**: Clean separation between physics systems, collision detection, and rendering
+
+## Quick Start
+
+### CPU-Only Physics (No Vulkan Required)
+```cpp
+#include "physics_engine.h"
+
+PhysicsEngine engine;
+engine.initialize(0, 100); // 0 particles, 100 rigidbodies
+
+// Create physics layers
+uint32_t dynamicLayer = engine.createPhysicsLayer("Dynamic");
+uint32_t staticLayer = engine.createPhysicsLayer("Static");
+engine.setLayerInteraction(dynamicLayer, staticLayer, true);
+
+// Create rigidbodies
+uint32_t groundId = engine.createRigidBody(0, -1, 0, 10, 0.2f, 10, 0, staticLayer);
+uint32_t boxId = engine.createRigidBody(0, 5, 0, 1, 1, 1, 1, dynamicLayer);
+
+// Run simulation
+engine.setGravity(0, -9.81f, 0);
+engine.updatePhysics(1.0f/60.0f);
+```
+
+### Hybrid GPU/CPU Physics (With Vulkan)
+```cpp
+PhysicsEngine engine;
+engine.initialize(1000, 100); // 1000 particles, 100 rigidbodies
+
+// Add particles (GPU)
+engine.addParticle(0, 10, 0, 0, -1, 0, 1.0f);
+
+// Add rigidbodies (CPU)
+uint32_t boxId = engine.createRigidBody(0, 5, 0, 1, 1, 1, 1.0f);
+
+engine.updatePhysics(deltaTime); // Updates both GPU and CPU physics
+```
 
 ## Architecture
 

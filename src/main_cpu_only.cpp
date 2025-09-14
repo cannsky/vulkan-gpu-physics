@@ -3,8 +3,9 @@
 #include <chrono>
 #include <thread>
 #include <random>
+#include <iomanip>
 #include "physics_engine.h"
-#include "managers/vulkanmanager/VulkanManager.h"
+#include "cpu_physics/CPUPhysicsSystem.h"
 #include "managers/logmanager/Logger.h"
 
 int main() {
@@ -12,59 +13,41 @@ int main() {
     Logger::getInstance().setLogLevel(LogLevel::INFO);
     Logger::getInstance().enableCategory(LogCategory::PHYSICS);
     Logger::getInstance().enableCategory(LogCategory::RIGIDBODY);
-    Logger::getInstance().enableCategory(LogCategory::PARTICLES);
     Logger::getInstance().enableCategory(LogCategory::PERFORMANCE);
     Logger::getInstance().enableConsoleOutput(true);
     Logger::getInstance().setOutputFile("titanium_physics_simulation.log");
     
-    std::cout << "Titanium Physics Engine - Hybrid GPU/CPU Physics System" << std::endl;
-    std::cout << "=======================================================" << std::endl;
+    std::cout << "Titanium Physics Engine - CPU-Only Demo" << std::endl;
+    std::cout << "=======================================" << std::endl;
     
-    LOG_INFO(LogCategory::GENERAL, "Starting Titanium Physics simulation");
+    LOG_INFO(LogCategory::GENERAL, "Starting Titanium Physics CPU-only simulation");
     
-    // Try to initialize Vulkan for GPU physics (optional)
-    bool vulkanAvailable = false;
-    auto& vulkanManager = VulkanManager::getInstance();
-    if (vulkanManager.initialize()) {
-        vulkanAvailable = true;
-        std::cout << "Vulkan initialized successfully - GPU physics available" << std::endl;
-    } else {
-        std::cout << "Vulkan not available - using CPU-only physics" << std::endl;
-    }
-    
-    // Initialize Titanium Physics Engine
+    // Initialize Titanium Physics Engine (CPU-only)
     PhysicsEngine physicsEngine;
     
-    uint32_t maxParticles = vulkanAvailable ? 1000 : 0; // Only use particles if Vulkan is available
+    uint32_t maxParticles = 0;        // No GPU particles in CPU-only mode
     uint32_t maxRigidBodies = 50;
     
     if (!physicsEngine.initialize(maxParticles, maxRigidBodies)) {
         std::cerr << "Failed to initialize Titanium Physics Engine!" << std::endl;
-        if (vulkanAvailable) {
-            vulkanManager.cleanup();
-        }
         return -1;
     }
     
     std::cout << "Titanium Physics Engine initialized successfully" << std::endl;
-    std::cout << "GPU Physics: " << (vulkanAvailable ? "Enabled" : "Disabled") << std::endl;
+    std::cout << "GPU Physics: Disabled (CPU-only mode)" << std::endl;
     std::cout << "CPU Physics: Enabled" << std::endl;
     
     // Create physics layers for collision filtering
     uint32_t dynamicLayer = physicsEngine.createPhysicsLayer("Dynamic");
     uint32_t staticLayer = physicsEngine.createPhysicsLayer("Static");
-    uint32_t particleLayer = physicsEngine.createPhysicsLayer("Particles");
     
     // Set up layer interactions
     physicsEngine.setLayerInteraction(dynamicLayer, staticLayer, true);    // Dynamic can hit static
     physicsEngine.setLayerInteraction(dynamicLayer, dynamicLayer, true);   // Dynamic can hit dynamic
-    physicsEngine.setLayerInteraction(particleLayer, staticLayer, true);   // Particles can hit static
-    physicsEngine.setLayerInteraction(particleLayer, dynamicLayer, true);  // Particles can hit dynamic
     
     std::cout << "\nCreated physics layers:" << std::endl;
     std::cout << "- Dynamic: " << dynamicLayer << std::endl;
     std::cout << "- Static: " << staticLayer << std::endl;
-    std::cout << "- Particles: " << particleLayer << std::endl;
     
     // Create static environment (ground and walls)
     auto groundId = physicsEngine.createRigidBody(0.0f, -1.0f, 0.0f, 20.0f, 0.4f, 20.0f, 0.0f, staticLayer);
@@ -84,10 +67,10 @@ int main() {
     std::uniform_real_distribution<float> sizeDist(0.5f, 1.5f);
     std::uniform_real_distribution<float> massDist(0.5f, 3.0f);
     
-    const int numDynamicBodies = 10;
+    const int numDynamicBodies = 15;
     for (int i = 0; i < numDynamicBodies; ++i) {
         float x = posDist(gen);
-        float y = 5.0f + i * 2.0f; // Stack them vertically
+        float y = 5.0f + i * 1.5f; // Stack them vertically
         float z = posDist(gen);
         float size = sizeDist(gen);
         float mass = massDist(gen);
@@ -98,41 +81,25 @@ int main() {
     
     std::cout << "\nCreated " << numDynamicBodies << " dynamic rigidbodies" << std::endl;
     
-    // Add particles if GPU physics is available
-    if (vulkanAvailable) {
-        const int numParticles = 200;
-        std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
-        
-        for (int i = 0; i < numParticles; ++i) {
-            float x = posDist(gen);
-            float y = 15.0f + posDist(gen) * 5.0f; // Start high above the rigidbodies
-            float z = posDist(gen);
-            float vx = velDist(gen);
-            float vy = velDist(gen);
-            float vz = velDist(gen);
-            
-            physicsEngine.addParticle(x, y, z, vx, vy, vz, 0.1f);
-        }
-        
-        std::cout << "Added " << numParticles << " particles" << std::endl;
-    }
-    
     // Set gravity
     physicsEngine.setGravity(0.0f, -9.81f, 0.0f);
     
     std::cout << "\nStarting physics simulation..." << std::endl;
-    std::cout << "Press Ctrl+C to stop the simulation" << std::endl;
+    std::cout << "Running for 10 seconds..." << std::endl;
     std::cout << "\nSimulation Statistics:" << std::endl;
     
     // Simulation loop
-    auto lastTime = std::chrono::high_resolution_clock::now();
+    auto startTime = std::chrono::high_resolution_clock::now();
+    auto lastTime = startTime;
     float totalTime = 0.0f;
     int frameCount = 0;
     const float targetFrameTime = 1.0f / 60.0f; // 60 FPS
+    const float simulationDuration = 10.0f; // Run for 10 seconds
     
-    while (true) {
+    while (totalTime < simulationDuration) {
         auto currentTime = std::chrono::high_resolution_clock::now();
         float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+        float totalElapsed = std::chrono::duration<float>(currentTime - startTime).count();
         lastTime = currentTime;
         
         // Clamp delta time to prevent large jumps
@@ -145,7 +112,7 @@ int main() {
         frameCount++;
         
         // Print statistics every second
-        if (totalTime >= 1.0f) {
+        if (frameCount % 60 == 0) {
             // Calculate average height of dynamic bodies
             float avgHeight = 0.0f;
             float minHeight = 100.0f;
@@ -168,19 +135,15 @@ int main() {
             }
             
             // Log performance statistics
-            LOG_PERFORMANCE_INFO("FPS: " + std::to_string(frameCount) + 
-                               ", Avg RigidBody Height: " + std::to_string(avgHeight));
+            LOG_PERFORMANCE_INFO("Time: " + std::to_string(totalElapsed) + 
+                               "s, Avg RigidBody Height: " + std::to_string(avgHeight));
             
-            std::cout << "FPS: " << frameCount 
+            std::cout << "Time: " << std::fixed << std::setprecision(1) << totalElapsed << "s"
                       << ", RigidBodies: " << activeBodies
-                      << ", Particles: " << physicsEngine.getParticleCount()
-                      << ", Avg Height: " << avgHeight
-                      << ", Min Height: " << minHeight
-                      << ", Max Height: " << maxHeight
+                      << ", Avg Height: " << std::setprecision(2) << avgHeight
+                      << ", Min: " << minHeight
+                      << ", Max: " << maxHeight
                       << std::endl;
-            
-            totalTime = 0.0f;
-            frameCount = 0;
         }
         
         // Maintain target frame rate
@@ -194,12 +157,24 @@ int main() {
         }
     }
     
-    // Cleanup
-    physicsEngine.cleanup();
-    if (vulkanAvailable) {
-        vulkanManager.cleanup();
+    // Final statistics
+    std::cout << "\nFinal positions of dynamic bodies:" << std::endl;
+    for (size_t i = 0; i < dynamicBodies.size() && i < 5; ++i) {
+        auto* body = physicsEngine.getRigidBody(dynamicBodies[i]);
+        if (body) {
+            std::cout << "Body " << dynamicBodies[i] << ": ("
+                      << std::fixed << std::setprecision(2)
+                      << body->transform.position[0] << ", "
+                      << body->transform.position[1] << ", "
+                      << body->transform.position[2] << ")" << std::endl;
+        }
     }
     
-    std::cout << "Titanium Physics simulation ended." << std::endl;
+    std::cout << "\nAverage FPS: " << (frameCount / totalTime) << std::endl;
+    
+    // Cleanup
+    physicsEngine.cleanup();
+    
+    std::cout << "\nTitanium Physics CPU-only simulation completed successfully!" << std::endl;
     return 0;
 }
