@@ -90,6 +90,7 @@ add_executable(physics-tests
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
@@ -114,6 +115,7 @@ add_executable(legacy-physics-tests
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
