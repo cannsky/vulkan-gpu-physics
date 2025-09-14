@@ -1,4 +1,4 @@
-# Vulkan GPU Physics
+# Titanium GPU Physics
 [![Vulkan - Ubuntu](https://github.com/cannsky/vulkan-gpu-physics/actions/workflows/vulkan-ubuntu.yml/badge.svg)](https://github.com/cannsky/vulkan-gpu-physics/actions/workflows/vulkan-ubuntu.yml)
 
 A unified GPU-accelerated physics simulation system using Vulkan compute shaders and C++. Supports both particle-based and rigid body physics with advanced collision detection.
@@ -93,7 +93,7 @@ make -j$(nproc)
 
 ```bash
 # From the build directory
-./tulpar-physics
+./titanium-gpu-physics
 ```
 
 **Note**: The application requires a Vulkan-compatible GPU and drivers. On systems without Vulkan support, the application will fail to initialize the Vulkan context.

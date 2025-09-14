@@ -2,7 +2,7 @@
 #include "workers/BroadPhaseWorker.h"
 #include "workers/DetectCollisionWorker.h"
 #include "workers/ContactResolverWorker.h"
-// #include "workers/GPUBufferWorker.h" // Optional GPU functionality
+#include "workers/GPUBufferWorker.h" // Required for complete type in std::unique_ptr
 
 CollisionManager& CollisionManager::getInstance() {
     static CollisionManager instance;

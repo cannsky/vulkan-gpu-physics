@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(tulpar-physics VERSION 1.0.0)
+project(titanium-gpu-physics VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,7 +11,7 @@ find_package(Vulkan REQUIRED)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 
 # Add executable
-add_executable(tulpar-physics
+add_executable(titanium-gpu-physics
     src/main.cpp
     src/components/vulkan/VulkanInstance.cpp
     src/components/vulkan/VulkanDevice.cpp
@@ -37,13 +37,13 @@ add_executable(tulpar-physics
 )
 
 # Include directories
-target_include_directories(tulpar-physics PRIVATE
+target_include_directories(titanium-gpu-physics PRIVATE
     src
     ${Vulkan_INCLUDE_DIRS}
 )
 
 # Link libraries
-target_link_libraries(tulpar-physics
+target_link_libraries(titanium-gpu-physics
     ${Vulkan_LIBRARIES}
 )
 
@@ -72,10 +72,10 @@ foreach(SHADER ${SHADERS})
 endforeach()
 
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
-add_dependencies(tulpar-physics shaders)
+add_dependencies(titanium-gpu-physics shaders)
 
 # Set output directory for shaders
-set_target_properties(tulpar-physics PROPERTIES
+set_target_properties(titanium-gpu-physics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
