@@ -5,7 +5,7 @@
 // Only include GPU physics if Vulkan is available
 #ifdef VULKAN_AVAILABLE
 #include "gpu_physics/GPUPhysicsEngine.h"
-#include "managers/vulkanmanager/VulkanManager.h"
+#include "gpu_physics/managers/vulkanmanager/VulkanManager.h"
 #endif
 
 PhysicsEngine::PhysicsEngine() {

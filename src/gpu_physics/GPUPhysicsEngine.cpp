@@ -1,8 +1,8 @@
 #include "GPUPhysicsEngine.h"
-#include "../components/vulkan/VulkanContext.h"
-#include "../components/vulkan/physics/BufferManager.h"
-#include "../components/vulkan/physics/ComputePipeline.h"
-#include "../managers/particlemanager/ParticleManager.h"
+#include "components/vulkan/VulkanContext.h"
+#include "components/vulkan/physics/BufferManager.h"
+#include "components/vulkan/physics/ComputePipeline.h"
+#include "managers/particlemanager/ParticleManager.h"
 #include "../managers/logmanager/Logger.h"
 #include <iostream>
 

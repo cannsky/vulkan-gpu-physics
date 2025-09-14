@@ -1,8 +1,8 @@
 #include "VulkanManager.h"
-#include "../../components/vulkan/VulkanInstance.h"
-#include "../../components/vulkan/VulkanDevice.h"
-#include "../../components/vulkan/VulkanCommandPool.h"
-#include "../../components/vulkan/VulkanContext.h"
+#include "../components/vulkan/VulkanInstance.h"
+#include "../components/vulkan/VulkanDevice.h"
+#include "../components/vulkan/VulkanCommandPool.h"
+#include "../components/vulkan/VulkanContext.h"
 #include <stdexcept>
 
 VulkanManager& VulkanManager::getInstance() {

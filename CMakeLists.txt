@@ -13,13 +13,13 @@ if(Vulkan_FOUND)
     add_compile_definitions(VULKAN_AVAILABLE)
     set(VULKAN_SOURCES
         src/gpu_physics/GPUPhysicsEngine.cpp
-        src/components/vulkan/VulkanInstance.cpp
-        src/components/vulkan/VulkanDevice.cpp
-        src/components/vulkan/VulkanCommandPool.cpp
-        src/components/vulkan/VulkanContext.cpp
-        src/components/vulkan/physics/BufferManager.cpp
-        src/components/vulkan/physics/ComputePipeline.cpp
-        src/managers/vulkanmanager/VulkanManager.cpp
+        src/gpu_physics/components/vulkan/VulkanInstance.cpp
+        src/gpu_physics/components/vulkan/VulkanDevice.cpp
+        src/gpu_physics/components/vulkan/VulkanCommandPool.cpp
+        src/gpu_physics/components/vulkan/VulkanContext.cpp
+        src/gpu_physics/components/vulkan/physics/BufferManager.cpp
+        src/gpu_physics/components/vulkan/physics/ComputePipeline.cpp
+        src/gpu_physics/managers/vulkanmanager/VulkanManager.cpp
     )
     set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
     set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
@@ -64,7 +64,7 @@ target_link_libraries(titanium-gpu-physics
 if(Vulkan_FOUND)
     find_program(GLSLANGVALIDATOR glslangValidator REQUIRED)
 
-    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/components/shaders)
+    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/gpu_physics/shaders)
     set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 
     file(GLOB SHADERS
