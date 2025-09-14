@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../logmanager/Logger.h"
+#include "../../../managers/logmanager/Logger.h"
 
 class LoggingLevelsTest : public Test {
 public:

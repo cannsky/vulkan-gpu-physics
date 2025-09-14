@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <cstdint>
 
 struct RigidBody {
     float position[3];

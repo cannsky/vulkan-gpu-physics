@@ -1,9 +1,8 @@
 #include "CollisionManager.h"
-#include "../vulkanmanager/VulkanManager.h"
 #include "workers/BroadPhaseWorker.h"
 #include "workers/DetectCollisionWorker.h"
 #include "workers/ContactResolverWorker.h"
-#include "workers/GPUBufferWorker.h"
+#include "workers/GPUBufferWorker.h" // Required for complete type in std::unique_ptr
 
 CollisionManager& CollisionManager::getInstance() {
     static CollisionManager instance;
@@ -41,10 +40,11 @@ bool CollisionManager::initialize() {
 }
 
 void CollisionManager::cleanup() {
-    if (gpuBufferWorker) {
-        gpuBufferWorker->cleanup();
-        gpuBufferWorker.reset();
-    }
+    // GPU functionality commented out for non-Vulkan builds
+    // if (gpuBufferWorker) {
+    //     gpuBufferWorker->cleanup();
+    //     gpuBufferWorker.reset();
+    // }
     
     contactResolverWorker.reset();
     detectCollisionWorker.reset();
@@ -65,7 +65,7 @@ void CollisionManager::updateCollisions(float deltaTime) {
         return;
     }
     
-    detectCollisions();
+    // Note: detectCollisions now requires RigidBodyWorker to be passed from caller
     resolveContacts(deltaTime);
 }
 
@@ -77,14 +77,12 @@ void CollisionManager::updateBroadPhase(const std::vector<RigidBody>& rigidBodie
     broadPhaseWorker->updateBroadPhase(rigidBodies, collisionPairs);
 }
 
-void CollisionManager::detectCollisions() {
-    if (!initialized || !detectCollisionWorker) {
+void CollisionManager::detectCollisions(std::shared_ptr<RigidBodyWorker> rigidBodyWorker) {
+    if (!initialized || !detectCollisionWorker || !rigidBodyWorker) {
         return;
     }
     
-    // Note: This would need a rigid body system reference
-    // For now, we'll just process existing collision pairs
-    // detectCollisionWorker->detectCollisions(collisionPairs, rigidBodySystem, contacts, maxContacts, contactCount);
+    detectCollisionWorker->detectCollisions(collisionPairs, rigidBodyWorker, contacts, maxContacts, contactCount);
 }
 
 void CollisionManager::resolveContacts(float deltaTime) {
@@ -104,15 +102,17 @@ uint32_t CollisionManager::getCollisionPairCount() const {
 }
 
 void CollisionManager::uploadContactsToGPU() {
-    if (!gpuBufferWorker) {
-        return;
-    }
-    gpuBufferWorker->uploadContactsToGPU(contactCount);
+    // GPU functionality commented out for non-Vulkan builds
+    // if (!gpuBufferWorker) {
+    //     return;
+    // }
+    // gpuBufferWorker->uploadContactsToGPU(contactCount);
 }
 
 void CollisionManager::downloadContactsFromGPU() {
-    if (!gpuBufferWorker) {
-        return;
-    }
-    gpuBufferWorker->downloadContactsFromGPU();
+    // GPU functionality commented out for non-Vulkan builds
+    // if (!gpuBufferWorker) {
+    //     return;
+    // }
+    // gpuBufferWorker->downloadContactsFromGPU();
 }

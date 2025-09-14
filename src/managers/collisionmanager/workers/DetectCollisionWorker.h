@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-class RigidBodySystem;
+class RigidBodyWorker;
 
 class DetectCollisionWorker {
 public:
@@ -14,7 +14,7 @@ public:
     
     // Narrow phase collision detection
     void detectCollisions(const std::vector<CollisionPair>& collisionPairs, 
-                         std::shared_ptr<RigidBodySystem> rigidBodySystem,
+                         std::shared_ptr<RigidBodyWorker> rigidBodyWorker,
                          std::vector<Contact>& contacts,
                          uint32_t maxContacts,
                          uint32_t& contactCount);

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(tulpar-physics VERSION 1.0.0)
+project(titanium-gpu-physics VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,16 +11,15 @@ find_package(Vulkan REQUIRED)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 
 # Add executable
-add_executable(tulpar-physics
+add_executable(titanium-gpu-physics
     src/main.cpp
-    src/vulkan/VulkanInstance.cpp
-    src/vulkan/VulkanDevice.cpp
-    src/vulkan/VulkanCommandPool.cpp
-    src/vulkan/VulkanContext.cpp
+    src/components/vulkan/VulkanInstance.cpp
+    src/components/vulkan/VulkanDevice.cpp
+    src/components/vulkan/VulkanCommandPool.cpp
+    src/components/vulkan/VulkanContext.cpp
     src/components/physics/PhysicsEngine.cpp
-    src/vulkan/physics/BufferManager.cpp
-    src/vulkan/physics/ComputePipeline.cpp
-    src/components/rigidbody/RigidBodySystem.cpp
+    src/components/vulkan/physics/BufferManager.cpp
+    src/components/vulkan/physics/ComputePipeline.cpp
     src/managers/logmanager/Logger.cpp
     src/managers/vulkanmanager/VulkanManager.cpp
     src/managers/physicsmanager/PhysicsManager.cpp
@@ -34,17 +33,17 @@ add_executable(tulpar-physics
     src/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/factories/RigidBodyFactory.cpp
-    src/managers/testmanager/TestManager.cpp
+    src/components/tests/TestManager.cpp
 )
 
 # Include directories
-target_include_directories(tulpar-physics PRIVATE
+target_include_directories(titanium-gpu-physics PRIVATE
     src
     ${Vulkan_INCLUDE_DIRS}
 )
 
 # Link libraries
-target_link_libraries(tulpar-physics
+target_link_libraries(titanium-gpu-physics
     ${Vulkan_LIBRARIES}
 )
 
@@ -73,10 +72,10 @@ foreach(SHADER ${SHADERS})
 endforeach()
 
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})
-add_dependencies(tulpar-physics shaders)
+add_dependencies(titanium-gpu-physics shaders)
 
 # Set output directory for shaders
-set_target_properties(tulpar-physics PROPERTIES
+set_target_properties(titanium-gpu-physics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
@@ -86,17 +85,18 @@ enable_testing()
 # Add test executable with new framework
 add_executable(physics-tests
     src/test_runner.cpp
-    src/managers/testmanager/TestManager.cpp
+    src/components/tests/TestManager.cpp
     src/components/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(physics-tests PRIVATE
     src
-    src/managers/testmanager/tests
+    src/components/tests/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 
@@ -110,17 +110,18 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
     src/test_physics_systems.cpp
-    src/managers/testmanager/TestManager.cpp
+    src/components/tests/TestManager.cpp
     src/components/rigidbody/RigidBodySystem.cpp
     src/managers/collisionmanager/workers/BroadPhaseWorker.cpp
     src/managers/collisionmanager/workers/DetectCollisionWorker.cpp
     src/managers/collisionmanager/workers/ContactResolverWorker.cpp
+    src/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
-    src/managers/testmanager/tests
+    src/components/tests/tests
     ${Vulkan_INCLUDE_DIRS}
 )
 

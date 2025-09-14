@@ -4,11 +4,9 @@
 #include <memory>
 #include <vector>
 
-class RigidBodySystem;
-
 /**
  * RigidBody worker for PhysicsManager.
- * Manages rigidbody operations and coordinates with RigidBodySystem when needed.
+ * Manages rigidbody operations with CPU-based physics simulation.
  */
 class RigidBodyWorker {
 public:
@@ -32,10 +30,6 @@ public:
     void setMaxRigidBodies(uint32_t maxBodies) { maxRigidBodies = maxBodies; }
     uint32_t getMaxRigidBodies() const { return maxRigidBodies; }
     uint32_t getRigidBodyCount() const { return static_cast<uint32_t>(rigidBodies.size()); }
-    
-    // Access to underlying RigidBodySystem (when GPU operations are needed)
-    void setRigidBodySystem(std::shared_ptr<RigidBodySystem> system) { rigidBodySystem = system; }
-    std::shared_ptr<RigidBodySystem> getRigidBodySystem() const { return rigidBodySystem; }
 
 private:
     bool initialized = false;
@@ -44,9 +38,6 @@ private:
     
     std::vector<RigidBody> rigidBodies;
     std::vector<uint32_t> freeIds; // For ID reuse
-    
-    // Optional GPU-based RigidBodySystem for compute operations
-    std::shared_ptr<RigidBodySystem> rigidBodySystem;
     
     struct {
         float x = 0.0f;

@@ -1,7 +1,7 @@
 #include "VulkanContext.h"
-#include "../vulkan/VulkanInstance.h"
-#include "../vulkan/VulkanDevice.h"
-#include "../vulkan/VulkanCommandPool.h"
+#include "VulkanInstance.h"
+#include "VulkanDevice.h"
+#include "VulkanCommandPool.h"
 #include <iostream>
 
 VulkanContext::VulkanContext() {

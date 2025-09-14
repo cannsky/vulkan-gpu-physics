@@ -1,5 +1,4 @@
 #include "RigidBodyWorker.h"
-#include "../../../components/rigidbody/RigidBodySystem.h"
 #include <algorithm>
 
 RigidBodyWorker::RigidBodyWorker() {
@@ -22,7 +21,6 @@ bool RigidBodyWorker::initialize() {
 void RigidBodyWorker::cleanup() {
     rigidBodies.clear();
     freeIds.clear();
-    rigidBodySystem.reset();
     initialized = false;
 }
 
@@ -45,11 +43,6 @@ uint32_t RigidBodyWorker::addRigidBody(const RigidBody& body) {
     
     rigidBodies.push_back(body);
     
-    // If we have a GPU-based system, add it there too
-    if (rigidBodySystem) {
-        rigidBodySystem->createRigidBody(body);
-    }
-    
     return id;
 }
 
@@ -69,11 +62,6 @@ bool RigidBodyWorker::removeRigidBody(uint32_t bodyId) {
     if (it != rigidBodies.end()) {
         rigidBodies.erase(it);
         freeIds.push_back(bodyId);
-        
-        // Remove from GPU system if available
-        if (rigidBodySystem) {
-            rigidBodySystem->removeRigidBody(bodyId);
-        }
         
         return true;
     }
@@ -117,20 +105,10 @@ void RigidBodyWorker::updatePhysics(float deltaTime) {
         body.position[1] += body.velocity[1] * deltaTime;
         body.position[2] += body.velocity[2] * deltaTime;
     }
-    
-    // If we have a GPU system, delegate more complex operations to it
-    if (rigidBodySystem) {
-        rigidBodySystem->updateUniformBuffer(deltaTime);
-    }
 }
 
 void RigidBodyWorker::setGravity(float x, float y, float z) {
     gravity.x = x;
     gravity.y = y;
     gravity.z = z;
-    
-    // Forward to GPU system if available
-    if (rigidBodySystem) {
-        rigidBodySystem->setGravity(x, y, z);
-    }
 }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This refactoring implements a comprehensive manager-based architecture with singleton pattern for the Vulkan GPU Physics engine. The new structure provides better organization, centralized resource management, and performance optimizations through a layer system.
+This refactoring implements a comprehensive manager-based architecture with singleton pattern for the Titanium GPU Physics engine. The new structure provides better organization, centralized resource management, and performance optimizations through a layer system.
 
 ## New Architecture
 

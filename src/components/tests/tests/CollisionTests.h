@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../collisionmanager/CollisionManager.h"
-#include "../../../components/rigidbody/RigidBody.h"
-#include "../../logmanager/Logger.h"
+#include "../../../managers/collisionmanager/CollisionManager.h"
+#include "../../rigidbody/RigidBody.h"
+#include "../../../managers/logmanager/Logger.h"
 #include <cmath>
 
 class SphereCollisionDetectionTest : public Test {

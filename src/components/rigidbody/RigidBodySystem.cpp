@@ -1,6 +1,6 @@
 #include "RigidBodySystem.h"
-#include "../../vulkan/physics/BufferManager.h"
-#include "../../vulkan/VulkanContext.h"
+#include "../vulkan/physics/BufferManager.h"
+#include "../vulkan/VulkanContext.h"
 #include <iostream>
 #include <cstring>
 #include <cmath>

@@ -7,7 +7,7 @@
 
 // Forward declarations
 struct RigidBody;
-class RigidBodySystem;
+class RigidBodyWorker;
 class BroadPhaseWorker;
 class DetectCollisionWorker;
 class ContactResolverWorker;
@@ -28,7 +28,7 @@ public:
     
     // Collision operations
     void updateCollisions(float deltaTime);
-    void detectCollisions();
+    void detectCollisions(std::shared_ptr<RigidBodyWorker> rigidBodyWorker);
     void resolveContacts(float deltaTime);
     
     // Broad phase operations
