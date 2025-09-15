@@ -47,9 +47,10 @@ int main(int argc, char* argv[]) {
     // Try to initialize Vulkan for GPU physics (optional, unless forced CPU-only)
     bool vulkanAvailable = false;
 #ifdef VULKAN_AVAILABLE
+    VulkanManager* vulkanManager = nullptr;
     if (!cpuOnlyMode) {
-        auto& vulkanManager = VulkanManager::getInstance();
-        if (vulkanManager.initialize()) {
+        vulkanManager = &VulkanManager::getInstance();
+        if (vulkanManager->initialize()) {
             vulkanAvailable = true;
             std::cout << "Vulkan initialized successfully - GPU physics available" << std::endl;
         } else {
@@ -71,8 +72,8 @@ int main(int argc, char* argv[]) {
     if (!physicsEngine.initialize(maxParticles, maxRigidBodies)) {
         std::cerr << "Failed to initialize Titanium Physics Engine!" << std::endl;
 #ifdef VULKAN_AVAILABLE
-        if (vulkanAvailable) {
-            vulkanManager.cleanup();
+        if (vulkanAvailable && vulkanManager) {
+            vulkanManager->cleanup();
         }
 #endif
         return -1;
@@ -229,8 +230,8 @@ int main(int argc, char* argv[]) {
     // Cleanup
     physicsEngine.cleanup();
 #ifdef VULKAN_AVAILABLE
-    if (vulkanAvailable) {
-        vulkanManager.cleanup();
+    if (vulkanAvailable && vulkanManager) {
+        vulkanManager->cleanup();
     }
 #endif
     
