@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../components/physics/Particle.h"
+#include "components/Particle.h"
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <memory>
