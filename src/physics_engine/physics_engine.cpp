@@ -1,11 +1,11 @@
 #include "physics_engine.h"
-#include "cpu_physics/CPUPhysicsEngine.h"
+#include "cpu_physics_engine/CPUPhysicsEngine.h"
 #include "managers/logmanager/Logger.h"
 
 // Only include GPU physics if Vulkan is available
 #ifdef VULKAN_AVAILABLE
-#include "gpu_physics/GPUPhysicsEngine.h"
-#include "gpu_physics/managers/vulkanmanager/VulkanManager.h"
+#include "gpu_physics_engine/GPUPhysicsEngine.h"
+#include "gpu_physics_engine/managers/vulkanmanager/VulkanManager.h"
 #endif
 
 PhysicsEngine::PhysicsEngine() {

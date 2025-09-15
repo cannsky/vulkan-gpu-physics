@@ -2,7 +2,7 @@
 #include "RigidBodyTests.h"
 #include "CollisionTests.h"
 #include "LoggerTests.h"
-#include "../../managers/logmanager/Logger.h"
+#include "../../../../physics_engine/managers/logmanager/Logger.h"
 #include <memory>
 #include <iostream>
 

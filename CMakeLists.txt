@@ -12,21 +12,21 @@ if(Vulkan_FOUND)
     message(STATUS "Vulkan found - GPU physics will be available")
     add_compile_definitions(VULKAN_AVAILABLE)
     set(VULKAN_SOURCES
-        src/gpu_physics/GPUPhysicsEngine.cpp
-        src/gpu_physics/components/vulkan/VulkanInstance.cpp
-        src/gpu_physics/components/vulkan/VulkanDevice.cpp
-        src/gpu_physics/components/vulkan/VulkanCommandPool.cpp
-        src/gpu_physics/components/vulkan/VulkanContext.cpp
-        src/gpu_physics/components/vulkan/physics/BufferManager.cpp
-        src/gpu_physics/components/vulkan/physics/ComputePipeline.cpp
-        src/gpu_physics/managers/vulkanmanager/VulkanManager.cpp
-        src/gpu_physics/managers/physicsmanager/GPUPhysicsManager.cpp
-        src/gpu_physics/managers/particlemanager/ParticleManager.cpp
-        src/gpu_physics/managers/shadermanager/ShaderManager.cpp
-        src/gpu_physics/managers/collisionmanager/CollisionManager.cpp
-        src/gpu_physics/managers/collisionmanager/workers/BroadPhaseWorker.cpp
-        src/gpu_physics/managers/collisionmanager/workers/DetectCollisionWorker.cpp
-        src/gpu_physics/managers/collisionmanager/workers/ContactResolverWorker.cpp
+        src/physics_engine/gpu_physics_engine/GPUPhysicsEngine.cpp
+        src/physics_engine/gpu_physics_engine/components/vulkan/VulkanInstance.cpp
+        src/physics_engine/gpu_physics_engine/components/vulkan/VulkanDevice.cpp
+        src/physics_engine/gpu_physics_engine/components/vulkan/VulkanCommandPool.cpp
+        src/physics_engine/gpu_physics_engine/components/vulkan/VulkanContext.cpp
+        src/physics_engine/gpu_physics_engine/components/vulkan/physics/BufferManager.cpp
+        src/physics_engine/gpu_physics_engine/components/vulkan/physics/ComputePipeline.cpp
+        src/physics_engine/gpu_physics_engine/managers/vulkanmanager/VulkanManager.cpp
+        src/physics_engine/gpu_physics_engine/managers/physicsmanager/GPUPhysicsManager.cpp
+        src/physics_engine/gpu_physics_engine/managers/particlemanager/ParticleManager.cpp
+        src/physics_engine/gpu_physics_engine/managers/shadermanager/ShaderManager.cpp
+        src/physics_engine/gpu_physics_engine/managers/collisionmanager/CollisionManager.cpp
+        src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/BroadPhaseWorker.cpp
+        src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/DetectCollisionWorker.cpp
+        src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/ContactResolverWorker.cpp
     )
     set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
     set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
@@ -44,20 +44,20 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 add_executable(titanium-gpu-physics
     src/main.cpp
     # New hybrid physics system
-    src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsEngine.cpp
+    src/physics_engine/physics_engine.cpp
+    src/physics_engine/cpu_physics_engine/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
-    src/cpu_physics/factories/rigidbody_component_factory.cpp
-    src/cpu_physics/factories/rigidbody_entity_factory.cpp
-    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    src/physics_engine/cpu_physics_engine/managers/ecs_manager/ecs_manager.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_component_factory.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_entity_factory.cpp
+    src/physics_engine/cpu_physics_engine/systems/cpu_physics_collision_system.cpp
     # Physics Managers
-    src/cpu_physics/managers/physicsmanager/CPUPhysicsManager.cpp
-    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
-    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     ${VULKAN_SOURCES}
     # Managers (CPU-only compatible)
-    src/managers/logmanager/Logger.cpp
+    src/physics_engine/managers/logmanager/Logger.cpp
 )
 
 # Include directories
@@ -75,7 +75,7 @@ target_link_libraries(titanium-gpu-physics
 if(Vulkan_FOUND)
     find_program(GLSLANGVALIDATOR glslangValidator REQUIRED)
 
-    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/gpu_physics/components/shaders)
+    set(SHADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/physics_engine/gpu_physics_engine/components/shaders)
     set(SHADER_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 
     file(GLOB SHADERS
@@ -111,26 +111,26 @@ enable_testing()
 # Add test executable with new consolidated framework  
 add_executable(physics-tests
     src/tests/test.cpp
-    src/components/tests/TestManager.cpp
-    src/cpu_physics/rigidbody/RigidBodySystem.cpp
+    src/tests/components/tests/TestManager.cpp
+    src/physics_engine/cpu_physics_engine/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
-    src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsEngine.cpp
+    src/physics_engine/physics_engine.cpp
+    src/physics_engine/cpu_physics_engine/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
-    src/cpu_physics/factories/rigidbody_component_factory.cpp
-    src/cpu_physics/factories/rigidbody_entity_factory.cpp
-    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    src/physics_engine/cpu_physics_engine/managers/ecs_manager/ecs_manager.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_component_factory.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_entity_factory.cpp
+    src/physics_engine/cpu_physics_engine/systems/cpu_physics_collision_system.cpp
     ${VULKAN_SOURCES}
     # CPU Physics Workers
-    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
-    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
-    src/managers/logmanager/Logger.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
+    src/physics_engine/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(physics-tests PRIVATE
     src
-    src/components/tests/tests
+    src/tests/components/tests/tests
     ${VULKAN_INCLUDE_DIRS}
 )
 
@@ -144,26 +144,26 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
     src/tests/test.cpp
-    src/components/tests/TestManager.cpp
-    src/cpu_physics/rigidbody/RigidBodySystem.cpp
+    src/tests/components/tests/TestManager.cpp
+    src/physics_engine/cpu_physics_engine/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
-    src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsEngine.cpp
+    src/physics_engine/physics_engine.cpp
+    src/physics_engine/cpu_physics_engine/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
-    src/cpu_physics/factories/rigidbody_component_factory.cpp
-    src/cpu_physics/factories/rigidbody_entity_factory.cpp
-    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    src/physics_engine/cpu_physics_engine/managers/ecs_manager/ecs_manager.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_component_factory.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_entity_factory.cpp
+    src/physics_engine/cpu_physics_engine/systems/cpu_physics_collision_system.cpp
     ${VULKAN_SOURCES}
     # CPU Physics Workers
-    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
-    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
-    src/managers/logmanager/Logger.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
+    src/physics_engine/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(legacy-physics-tests PRIVATE
     src
-    src/components/tests/tests
+    src/tests/components/tests/tests
     ${VULKAN_INCLUDE_DIRS}
 )
 
@@ -177,18 +177,18 @@ add_test(NAME LegacyPhysicsTests COMMAND legacy-physics-tests)
 # Add titanium physics standalone test (CPU only)
 add_executable(test-titanium-physics
     src/tests/test.cpp
-    src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsEngine.cpp
+    src/physics_engine/physics_engine.cpp
+    src/physics_engine/cpu_physics_engine/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
-    src/cpu_physics/factories/rigidbody_component_factory.cpp
-    src/cpu_physics/factories/rigidbody_entity_factory.cpp
-    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    src/physics_engine/cpu_physics_engine/managers/ecs_manager/ecs_manager.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_component_factory.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_entity_factory.cpp
+    src/physics_engine/cpu_physics_engine/systems/cpu_physics_collision_system.cpp
     # Physics Managers
-    src/cpu_physics/managers/physicsmanager/CPUPhysicsManager.cpp
-    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
-    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
-    src/managers/logmanager/Logger.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
+    src/physics_engine/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(test-titanium-physics PRIVATE
@@ -201,18 +201,18 @@ add_test(NAME TitaniumPhysicsTest COMMAND test-titanium-physics)
 # Add CPU-only demo executable
 add_executable(titanium-demo-cpu
     src/tests/test.cpp
-    src/physics_engine.cpp
-    src/cpu_physics/CPUPhysicsEngine.cpp
+    src/physics_engine/physics_engine.cpp
+    src/physics_engine/cpu_physics_engine/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
-    src/cpu_physics/factories/rigidbody_component_factory.cpp
-    src/cpu_physics/factories/rigidbody_entity_factory.cpp
-    src/cpu_physics/systems/cpu_physics_collision_system.cpp
+    src/physics_engine/cpu_physics_engine/managers/ecs_manager/ecs_manager.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_component_factory.cpp
+    src/physics_engine/cpu_physics_engine/factories/rigidbody_entity_factory.cpp
+    src/physics_engine/cpu_physics_engine/systems/cpu_physics_collision_system.cpp
     # Physics Managers
-    src/cpu_physics/managers/physicsmanager/CPUPhysicsManager.cpp
-    src/cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.cpp
-    src/cpu_physics/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
-    src/managers/logmanager/Logger.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
+    src/physics_engine/managers/logmanager/Logger.cpp
 )
 
 target_include_directories(titanium-demo-cpu PRIVATE

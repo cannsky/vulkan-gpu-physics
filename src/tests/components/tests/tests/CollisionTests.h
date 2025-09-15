@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../../gpu_physics/managers/collisionmanager/CollisionManager.h"
-#include "../../../cpu_physics/rigidbody/RigidBody.h"
-#include "../../../managers/logmanager/Logger.h"
+#include "../../../../physics_engine/gpu_physics_engine/managers/collisionmanager/CollisionManager.h"
+#include "../../../../physics_engine/cpu_physics_engine/rigidbody/RigidBody.h"
+#include "../../../../physics_engine/managers/logmanager/Logger.h"
 #include <cmath>
 
 class SphereCollisionDetectionTest : public Test {

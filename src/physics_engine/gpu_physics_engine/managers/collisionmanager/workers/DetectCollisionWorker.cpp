@@ -1,5 +1,5 @@
 #include "DetectCollisionWorker.h"
-#include "../../../../cpu_physics/managers/physicsmanager/workers/RigidBodyWorker.h"
+#include "../../../cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.h"
 #include <cmath>
 #include <cfloat>
 #include <algorithm>

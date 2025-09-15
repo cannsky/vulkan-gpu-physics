@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../../cpu_physics/rigidbody/RigidBodySystem.h"
-#include "../../../managers/logmanager/Logger.h"
+#include "../../../../physics_engine/cpu_physics_engine/rigidbody/RigidBodySystem.h"
+#include "../../../../physics_engine/managers/logmanager/Logger.h"
 #include <cmath>
 
 class RigidBodyCreationTest : public Test {
