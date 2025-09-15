@@ -10,7 +10,22 @@
 #endif
 #include "managers/logmanager/Logger.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+    // Parse command line arguments
+    bool cpuOnlyMode = false;
+    if (argc > 1) {
+        std::string arg = argv[1];
+        if (arg == "--cpu-only" || arg == "-c") {
+            cpuOnlyMode = true;
+        } else if (arg == "--help" || arg == "-h") {
+            std::cout << "Titanium Physics Engine - Hybrid GPU/CPU Physics System" << std::endl;
+            std::cout << "Usage: " << argv[0] << " [OPTIONS]" << std::endl;
+            std::cout << "Options:" << std::endl;
+            std::cout << "  --cpu-only, -c    Run in CPU-only mode (disable Vulkan/GPU physics)" << std::endl;
+            std::cout << "  --help, -h        Show this help message" << std::endl;
+            return 0;
+        }
+    }
     // Configure logging system
     Logger::getInstance().setLogLevel(LogLevel::INFO);
     Logger::getInstance().enableCategory(LogCategory::PHYSICS);
@@ -23,17 +38,25 @@ int main() {
     std::cout << "Titanium Physics Engine - Hybrid GPU/CPU Physics System" << std::endl;
     std::cout << "=======================================================" << std::endl;
     
+    if (cpuOnlyMode) {
+        std::cout << "Running in CPU-only mode (GPU physics disabled)" << std::endl;
+    }
+    
     LOG_INFO(LogCategory::GENERAL, "Starting Titanium Physics simulation");
     
-    // Try to initialize Vulkan for GPU physics (optional)
+    // Try to initialize Vulkan for GPU physics (optional, unless forced CPU-only)
     bool vulkanAvailable = false;
 #ifdef VULKAN_AVAILABLE
-    auto& vulkanManager = VulkanManager::getInstance();
-    if (vulkanManager.initialize()) {
-        vulkanAvailable = true;
-        std::cout << "Vulkan initialized successfully - GPU physics available" << std::endl;
+    if (!cpuOnlyMode) {
+        auto& vulkanManager = VulkanManager::getInstance();
+        if (vulkanManager.initialize()) {
+            vulkanAvailable = true;
+            std::cout << "Vulkan initialized successfully - GPU physics available" << std::endl;
+        } else {
+            std::cout << "Vulkan not available - using CPU-only physics" << std::endl;
+        }
     } else {
-        std::cout << "Vulkan not available - using CPU-only physics" << std::endl;
+        std::cout << "GPU physics disabled by user request - using CPU-only physics" << std::endl;
     }
 #else
     std::cout << "Vulkan not compiled - using CPU-only physics" << std::endl;

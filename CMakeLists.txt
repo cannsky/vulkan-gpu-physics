@@ -108,9 +108,9 @@ set_target_properties(titanium-gpu-physics PROPERTIES
 # Enable testing
 enable_testing()
 
-# Add test executable with new framework
+# Add test executable with new consolidated framework  
 add_executable(physics-tests
-    src/test_runner.cpp
+    src/tests/test.cpp
     src/components/tests/TestManager.cpp
     src/cpu_physics/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
@@ -143,7 +143,7 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 
 # Add legacy test executable for compatibility
 add_executable(legacy-physics-tests
-    src/test_physics_systems.cpp
+    src/tests/test.cpp
     src/components/tests/TestManager.cpp
     src/cpu_physics/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
@@ -176,7 +176,7 @@ add_test(NAME LegacyPhysicsTests COMMAND legacy-physics-tests)
 
 # Add titanium physics standalone test (CPU only)
 add_executable(test-titanium-physics
-    src/test_titanium_physics.cpp
+    src/tests/test.cpp
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
@@ -200,7 +200,7 @@ add_test(NAME TitaniumPhysicsTest COMMAND test-titanium-physics)
 
 # Add CPU-only demo executable
 add_executable(titanium-demo-cpu
-    src/main_cpu_only.cpp
+    src/tests/test.cpp
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
