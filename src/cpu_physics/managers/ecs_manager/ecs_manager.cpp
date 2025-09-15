@@ -1,6 +1,6 @@
 #include "ecs_manager.h"
-#include "../components.h"
-#include "../../managers/logmanager/Logger.h"
+#include "../../components.h"
+#include "../../../managers/logmanager/Logger.h"
 #include <algorithm>
 
 namespace cpu_physics {

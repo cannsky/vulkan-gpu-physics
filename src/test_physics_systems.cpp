@@ -1,5 +1,5 @@
 #include "gpu_physics/managers/collisionmanager/workers/DetectCollisionWorker.h"
-#include "components/rigidbody/RigidBodySystem.h"
+#include "cpu_physics/rigidbody/RigidBodySystem.h"
 #include "managers/logmanager/Logger.h"
 #include "components/tests/TestManager.h"
 #include "RigidBodyTests.h"

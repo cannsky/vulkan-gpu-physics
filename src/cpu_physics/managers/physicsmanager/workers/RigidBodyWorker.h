@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../components/rigidbody/RigidBody.h"
+#include "../../../rigidbody/RigidBody.h"
 #include <memory>
 #include <vector>
 

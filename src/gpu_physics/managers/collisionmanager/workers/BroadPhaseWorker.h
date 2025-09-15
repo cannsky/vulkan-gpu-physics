@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Contact.h"
-#include "../../../../components/rigidbody/RigidBody.h"
+#include "../../../../cpu_physics/rigidbody/RigidBody.h"
 #include <vector>
 
 class BroadPhaseWorker {

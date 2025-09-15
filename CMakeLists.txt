@@ -47,7 +47,7 @@ add_executable(titanium-gpu-physics
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
@@ -112,12 +112,12 @@ enable_testing()
 add_executable(physics-tests
     src/test_runner.cpp
     src/components/tests/TestManager.cpp
-    src/components/rigidbody/RigidBodySystem.cpp
+    src/cpu_physics/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
@@ -145,12 +145,12 @@ add_test(NAME PhysicsEngineTests COMMAND physics-tests)
 add_executable(legacy-physics-tests
     src/test_physics_systems.cpp
     src/components/tests/TestManager.cpp
-    src/components/rigidbody/RigidBodySystem.cpp
+    src/cpu_physics/rigidbody/RigidBodySystem.cpp
     # New hybrid physics system
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
@@ -180,7 +180,7 @@ add_executable(test-titanium-physics
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp
@@ -204,7 +204,7 @@ add_executable(titanium-demo-cpu
     src/physics_engine.cpp
     src/cpu_physics/CPUPhysicsEngine.cpp
     # ECS Architecture
-    src/cpu_physics/managers/ecs_manager.cpp
+    src/cpu_physics/managers/ecs_manager/ecs_manager.cpp
     src/cpu_physics/factories/rigidbody_component_factory.cpp
     src/cpu_physics/factories/rigidbody_entity_factory.cpp
     src/cpu_physics/systems/cpu_physics_collision_system.cpp

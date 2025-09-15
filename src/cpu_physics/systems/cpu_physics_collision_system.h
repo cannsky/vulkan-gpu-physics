@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../managers/ecs_manager.h"
+#include "../managers/ecs_manager/ecs_manager.h"
 #include "../components.h" // For component definitions
 #include <vector>
 #include <memory>
