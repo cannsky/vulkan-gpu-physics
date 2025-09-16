@@ -194,6 +194,7 @@ add_executable(test-titanium-physics
 
 target_include_directories(test-titanium-physics PRIVATE
     src
+    ${VULKAN_INCLUDE_DIRS}
 )
 
 # Register titanium physics test with CTest
