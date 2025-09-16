@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../managers/ecs_manager/ecs_manager.h"
-#include "rigidbody_component_factory.h"
+#include "../managers/ECSManager/ECSManager.h"
+#include "RigidbodyComponentFactory.h"
 #include <memory>
 
 namespace cpu_physics {

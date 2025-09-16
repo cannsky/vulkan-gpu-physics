@@ -9,10 +9,10 @@
 
 // ECS components and systems
 #include "components.h"
-#include "managers/ecs_manager/ecs_manager.h"
-#include "factories/rigidbody_component_factory.h"
-#include "factories/rigidbody_entity_factory.h"
-#include "systems/cpu_physics_collision_system.h"
+#include "managers/ECSManager/ECSManager.h"
+#include "factories/RigidbodyComponentFactory.h"
+#include "factories/RigidbodyEntityFactory.h"
+#include "systems/CpuPhysicsCollisionSystem.h"
 
 namespace cpu_physics {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../../../physics_engine/managers/logmanager/Logger.h"
+#include "../../../../PhysicsEngine/managers/logmanager/Logger.h"
 
 class LoggingLevelsTest : public Test {
 public:

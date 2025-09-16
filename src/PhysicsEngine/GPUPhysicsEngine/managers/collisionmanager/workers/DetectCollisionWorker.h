@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Contact.h"
-#include "../../../../cpu_physics_engine/rigidbody/RigidBody.h"
+#include "../../../../CPUPhysicsEngine/rigidbody/RigidBody.h"
 #include <vector>
 #include <memory>
 

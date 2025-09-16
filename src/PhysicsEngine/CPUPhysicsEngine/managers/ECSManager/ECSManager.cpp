@@ -1,4 +1,4 @@
-#include "ecs_manager.h"
+#include "ECSManager.h"
 #include "../../components.h"
 #include "../../../managers/logmanager/Logger.h"
 #include <algorithm>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../physics_engine/managers/BaseManager.h"
+#include "../../../PhysicsEngine/managers/BaseManager.h"
 #include "Test.h"
 #include "TestResult.h"
 #include <vector>
