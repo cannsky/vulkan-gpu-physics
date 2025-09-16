@@ -3,12 +3,12 @@
 #include <chrono>
 #include <thread>
 #include <random>
-#include "physics_engine/physics_engine.h"
-#include "physics_engine/cpu_physics_engine/CPUPhysicsEngine.h"
+#include "PhysicsEngine/PhysicsEngine.h"
+#include "PhysicsEngine/CPUPhysicsEngine/CPUPhysicsEngine.h"
 #ifdef VULKAN_AVAILABLE
-#include "physics_engine/gpu_physics_engine/managers/vulkanmanager/VulkanManager.h"
+#include "PhysicsEngine/GPUPhysicsEngine/managers/vulkanmanager/VulkanManager.h"
 #endif
-#include "physics_engine/managers/logmanager/Logger.h"
+#include "PhysicsEngine/managers/logmanager/Logger.h"
 
 int main(int argc, char* argv[]) {
     // Parse command line arguments

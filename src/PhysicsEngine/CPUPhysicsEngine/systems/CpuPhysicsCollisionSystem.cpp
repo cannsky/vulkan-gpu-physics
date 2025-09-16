@@ -1,4 +1,4 @@
-#include "cpu_physics_collision_system.h"
+#include "CpuPhysicsCollisionSystem.h"
 #include "../../managers/logmanager/Logger.h"
 #include <cmath>
 #include <algorithm>

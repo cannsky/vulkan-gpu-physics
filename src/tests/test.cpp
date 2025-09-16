@@ -1,7 +1,7 @@
 #include "../tests/components/tests/TestManager.h"
-#include "../physics_engine/managers/logmanager/Logger.h"
-#include "../physics_engine/cpu_physics_engine/CPUPhysicsEngine.h"
-#include "../physics_engine/physics_engine.h"
+#include "../PhysicsEngine/managers/logmanager/Logger.h"
+#include "../PhysicsEngine/CPUPhysicsEngine/CPUPhysicsEngine.h"
+#include "../PhysicsEngine/PhysicsEngine.h"
 #include <memory>
 #include <iostream>
 #include <cassert>

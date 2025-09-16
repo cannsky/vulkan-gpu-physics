@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Test.h"
-#include "../../../../physics_engine/gpu_physics_engine/managers/collisionmanager/CollisionManager.h"
-#include "../../../../physics_engine/cpu_physics_engine/rigidbody/RigidBody.h"
+#include "../../../../PhysicsEngine/GPUPhysicsEngine/managers/collisionmanager/CollisionManager.h"
+#include "../../../../PhysicsEngine/CPUPhysicsEngine/rigidbody/RigidBody.h"
 #include "../../../../physics_engine/managers/logmanager/Logger.h"
 #include <cmath>
 

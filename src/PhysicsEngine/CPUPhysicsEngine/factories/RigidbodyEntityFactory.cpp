@@ -1,4 +1,4 @@
-#include "rigidbody_entity_factory.h"
+#include "RigidbodyEntityFactory.h"
 #include "../../managers/logmanager/Logger.h"
 #include <cmath>
 
