@@ -1,7 +1,7 @@
 #include "RigidBodySystem.h"
 #ifdef VULKAN_AVAILABLE
-#include "../vulkan/physics/BufferManager.h"
-#include "../vulkan/VulkanContext.h"
+#include "../../gpu_physics_engine/components/vulkan/physics/BufferManager.h"
+#include "../../gpu_physics_engine/components/vulkan/VulkanContext.h"
 #endif
 #include <iostream>
 #include <cstring>

@@ -27,6 +27,7 @@ if(Vulkan_FOUND)
         src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/BroadPhaseWorker.cpp
         src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/DetectCollisionWorker.cpp
         src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/ContactResolverWorker.cpp
+        src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/GPUBufferWorker.cpp
     )
     set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
     set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
@@ -189,10 +190,18 @@ add_executable(test-titanium-physics
     src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/physics_engine/managers/logmanager/Logger.cpp
+    # GPU Physics sources when Vulkan is available
+    ${VULKAN_SOURCES}
 )
 
 target_include_directories(test-titanium-physics PRIVATE
     src
+    ${VULKAN_INCLUDE_DIRS}
+)
+
+# Link libraries
+target_link_libraries(test-titanium-physics
+    ${VULKAN_LIBRARIES}
 )
 
 # Register titanium physics test with CTest
@@ -213,10 +222,18 @@ add_executable(titanium-demo-cpu
     src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/RigidBodyWorker.cpp
     src/physics_engine/cpu_physics_engine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
     src/physics_engine/managers/logmanager/Logger.cpp
+    # GPU Physics sources when Vulkan is available
+    ${VULKAN_SOURCES}
 )
 
 target_include_directories(titanium-demo-cpu PRIVATE
     src
+    ${VULKAN_INCLUDE_DIRS}
+)
+
+# Link libraries
+target_link_libraries(titanium-demo-cpu
+    ${VULKAN_LIBRARIES}
 )
 
 # Register CPU demo test with CTest
