@@ -3,90 +3,157 @@
 #include <chrono>
 #include <thread>
 #include <random>
-#include "managers/vulkanmanager/VulkanManager.h"
-#include "managers/physicsmanager/PhysicsManager.h"
-#include "managers/particlemanager/ParticleManager.h"
-#include "factories/RigidBodyFactory.h"
-#include "managers/physicsmanager/workers/PhysicsLayerWorker.h"
-#include "managers/logmanager/Logger.h"
+#include "physics_engine/physics_engine.h"
+#include "physics_engine/cpu_physics_engine/CPUPhysicsEngine.h"
+#ifdef VULKAN_AVAILABLE
+#include "physics_engine/gpu_physics_engine/managers/vulkanmanager/VulkanManager.h"
+#endif
+#include "physics_engine/managers/logmanager/Logger.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+    // Parse command line arguments
+    bool cpuOnlyMode = false;
+    if (argc > 1) {
+        std::string arg = argv[1];
+        if (arg == "--cpu-only" || arg == "-c") {
+            cpuOnlyMode = true;
+        } else if (arg == "--help" || arg == "-h") {
+            std::cout << "Titanium Physics Engine - Hybrid GPU/CPU Physics System" << std::endl;
+            std::cout << "Usage: " << argv[0] << " [OPTIONS]" << std::endl;
+            std::cout << "Options:" << std::endl;
+            std::cout << "  --cpu-only, -c    Run in CPU-only mode (disable Vulkan/GPU physics)" << std::endl;
+            std::cout << "  --help, -h        Show this help message" << std::endl;
+            return 0;
+        }
+    }
     // Configure logging system
     Logger::getInstance().setLogLevel(LogLevel::INFO);
     Logger::getInstance().enableCategory(LogCategory::PHYSICS);
+    Logger::getInstance().enableCategory(LogCategory::RIGIDBODY);
     Logger::getInstance().enableCategory(LogCategory::PARTICLES);
     Logger::getInstance().enableCategory(LogCategory::PERFORMANCE);
-    Logger::getInstance().setOutputFile("physics_simulation.log");
+    Logger::getInstance().enableConsoleOutput(true);
+    Logger::getInstance().setOutputFile("titanium_physics_simulation.log");
     
-    std::cout << "Vulkan GPU Physics - Unified physics simulation system" << std::endl;
-    std::cout << "======================================================" << std::endl;
+    std::cout << "Titanium Physics Engine - Hybrid GPU/CPU Physics System" << std::endl;
+    std::cout << "=======================================================" << std::endl;
     
-    LOG_INFO(LogCategory::GENERAL, "Starting Vulkan GPU Physics simulation");
+    if (cpuOnlyMode) {
+        std::cout << "Running in CPU-only mode (GPU physics disabled)" << std::endl;
+    }
     
-    // Initialize managers in order
-    auto& vulkanManager = VulkanManager::getInstance();
-    if (!vulkanManager.initialize()) {
-        std::cerr << "Failed to initialize Vulkan manager!" << std::endl;
+    LOG_INFO(LogCategory::GENERAL, "Starting Titanium Physics simulation");
+    
+    // Try to initialize Vulkan for GPU physics (optional, unless forced CPU-only)
+    bool vulkanAvailable = false;
+#ifdef VULKAN_AVAILABLE
+    VulkanManager* vulkanManager = nullptr;
+    if (!cpuOnlyMode) {
+        vulkanManager = &VulkanManager::getInstance();
+        if (vulkanManager->initialize()) {
+            vulkanAvailable = true;
+            std::cout << "Vulkan initialized successfully - GPU physics available" << std::endl;
+        } else {
+            std::cout << "Vulkan not available - using CPU-only physics" << std::endl;
+        }
+    } else {
+        std::cout << "GPU physics disabled by user request - using CPU-only physics" << std::endl;
+    }
+#else
+    std::cout << "Vulkan not compiled - using CPU-only physics" << std::endl;
+#endif
+    
+    // Initialize Titanium Physics Engine
+    PhysicsEngine physicsEngine;
+    
+    uint32_t maxParticles = vulkanAvailable ? 1000 : 0; // Only use particles if Vulkan is available
+    uint32_t maxRigidBodies = 50;
+    
+    if (!physicsEngine.initialize(maxParticles, maxRigidBodies)) {
+        std::cerr << "Failed to initialize Titanium Physics Engine!" << std::endl;
+#ifdef VULKAN_AVAILABLE
+        if (vulkanAvailable && vulkanManager) {
+            vulkanManager->cleanup();
+        }
+#endif
         return -1;
     }
     
-    auto& physicsManager = PhysicsManager::getInstance();
-    if (!physicsManager.initialize()) {
-        std::cerr << "Failed to initialize physics manager!" << std::endl;
-        vulkanManager.cleanup();
-        return -1;
-    }
+    std::cout << "Titanium Physics Engine initialized successfully" << std::endl;
+    std::cout << "GPU Physics: " << (vulkanAvailable ? "Enabled" : "Disabled") << std::endl;
+    std::cout << "CPU Physics: Enabled" << std::endl;
     
-    auto& particleManager = ParticleManager::getInstance();
+    // Create physics layers for collision filtering
+    uint32_t dynamicLayer = physicsEngine.createPhysicsLayer("Dynamic");
+    uint32_t staticLayer = physicsEngine.createPhysicsLayer("Static");
+    uint32_t particleLayer = physicsEngine.createPhysicsLayer("Particles");
     
-    // Set up layer system using PhysicsLayerWorker through PhysicsManager
-    auto physicsLayerWorker = physicsManager.getLayerWorker();
-    auto particleLayer = physicsLayerWorker->createLayer("Particles");
-    auto staticLayer = physicsLayerWorker->createLayer("Static");
+    // Set up layer interactions
+    physicsEngine.setLayerInteraction(dynamicLayer, staticLayer, true);    // Dynamic can hit static
+    physicsEngine.setLayerInteraction(dynamicLayer, dynamicLayer, true);   // Dynamic can hit dynamic
+    physicsEngine.setLayerInteraction(particleLayer, staticLayer, true);   // Particles can hit static
+    physicsEngine.setLayerInteraction(particleLayer, dynamicLayer, true);  // Particles can hit dynamic
     
-    // Set up random number generation for particle initialization
+    std::cout << "\nCreated physics layers:" << std::endl;
+    std::cout << "- Dynamic: " << dynamicLayer << std::endl;
+    std::cout << "- Static: " << staticLayer << std::endl;
+    std::cout << "- Particles: " << particleLayer << std::endl;
+    
+    // Create static environment (ground and walls)
+    auto groundId = physicsEngine.createRigidBody(0.0f, -1.0f, 0.0f, 20.0f, 0.4f, 20.0f, 0.0f, staticLayer);
+    auto leftWallId = physicsEngine.createRigidBody(-10.0f, 5.0f, 0.0f, 0.4f, 10.0f, 20.0f, 0.0f, staticLayer);
+    auto rightWallId = physicsEngine.createRigidBody(10.0f, 5.0f, 0.0f, 0.4f, 10.0f, 20.0f, 0.0f, staticLayer);
+    
+    std::cout << "\nCreated static environment:" << std::endl;
+    std::cout << "- Ground: " << groundId << std::endl;
+    std::cout << "- Left wall: " << leftWallId << std::endl;
+    std::cout << "- Right wall: " << rightWallId << std::endl;
+    
+    // Create dynamic rigidbodies
+    std::vector<uint32_t> dynamicBodies;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> posDist(-5.0f, 5.0f);
-    std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
-    std::uniform_real_distribution<float> massDist(0.5f, 2.0f);
+    std::uniform_real_distribution<float> sizeDist(0.5f, 1.5f);
+    std::uniform_real_distribution<float> massDist(0.5f, 3.0f);
     
-    // Add some random particles
-    const int numParticles = 100;
-    std::cout << "\nAdding " << numParticles << " particles to the simulation..." << std::endl;
-    
-    for (int i = 0; i < numParticles; ++i) {
-        Particle particle = {};
-        particle.position[0] = posDist(gen);
-        particle.position[1] = posDist(gen) + 10.0f; // Start above ground
-        particle.position[2] = posDist(gen);
-        particle.velocity[0] = velDist(gen);
-        particle.velocity[1] = velDist(gen);
-        particle.velocity[2] = velDist(gen);
-        particle.mass = massDist(gen);
+    const int numDynamicBodies = 10;
+    for (int i = 0; i < numDynamicBodies; ++i) {
+        float x = posDist(gen);
+        float y = 5.0f + i * 2.0f; // Stack them vertically
+        float z = posDist(gen);
+        float size = sizeDist(gen);
+        float mass = massDist(gen);
         
-        if (!particleManager.addParticle(particle)) {
-            std::cerr << "Failed to add particle " << i << std::endl;
-            break;
-        }
+        auto bodyId = physicsEngine.createRigidBody(x, y, z, size, size, size, mass, dynamicLayer);
+        dynamicBodies.push_back(bodyId);
     }
     
-    // Create some rigid bodies using the factory
-    auto& rigidBodyFactory = RigidBodyFactory::getInstance();
+    std::cout << "\nCreated " << numDynamicBodies << " dynamic rigidbodies" << std::endl;
     
-    // Create a ground plane
-    auto groundPlane = rigidBodyFactory.createStaticPlane(0.0f, staticLayer);
-    std::cout << "Created ground plane at y=0" << std::endl;
-    
-    // Create some spheres
-    auto sphere1 = rigidBodyFactory.createSphere(0.0f, 5.0f, 0.0f, 1.0f, 1.0f, particleLayer);
-    auto sphere2 = rigidBodyFactory.createSphere(2.0f, 8.0f, 0.0f, 0.5f, 0.5f, particleLayer);
-    std::cout << "Created rigid body spheres" << std::endl;
+    // Add particles if GPU physics is available
+    if (vulkanAvailable) {
+        const int numParticles = 200;
+        std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
+        
+        for (int i = 0; i < numParticles; ++i) {
+            float x = posDist(gen);
+            float y = 15.0f + posDist(gen) * 5.0f; // Start high above the rigidbodies
+            float z = posDist(gen);
+            float vx = velDist(gen);
+            float vy = velDist(gen);
+            float vz = velDist(gen);
+            
+            physicsEngine.addParticle(x, y, z, vx, vy, vz, 0.1f);
+        }
+        
+        std::cout << "Added " << numParticles << " particles" << std::endl;
+    }
     
     // Set gravity
-    physicsManager.setGravity(0.0f, -9.81f, 0.0f);
+    physicsEngine.setGravity(0.0f, -9.81f, 0.0f);
     
-    std::cout << "Starting physics simulation..." << std::endl;
+    std::cout << "\nStarting physics simulation..." << std::endl;
     std::cout << "Press Ctrl+C to stop the simulation" << std::endl;
     std::cout << "\nSimulation Statistics:" << std::endl;
     
@@ -105,40 +172,41 @@ int main() {
         deltaTime = std::min(deltaTime, 0.016f); // Max 16ms
         
         // Update physics
-        physicsManager.updatePhysics(deltaTime);
+        physicsEngine.updatePhysics(deltaTime);
         
         totalTime += deltaTime;
         frameCount++;
         
-        // Log frame time for performance monitoring
-        Logger::getInstance().logFrameTime(deltaTime);
-        
         // Print statistics every second
         if (totalTime >= 1.0f) {
-            auto particles = particleManager.getParticles();
-            
-            // Calculate average height of particles
+            // Calculate average height of dynamic bodies
             float avgHeight = 0.0f;
-            float minHeight = particles.empty() ? 0.0f : particles[0].position[1];
-            float maxHeight = particles.empty() ? 0.0f : particles[0].position[1];
+            float minHeight = 100.0f;
+            float maxHeight = -100.0f;
+            int activeBodies = 0;
             
-            for (const auto& particle : particles) {
-                avgHeight += particle.position[1];
-                minHeight = std::min(minHeight, particle.position[1]);
-                maxHeight = std::max(maxHeight, particle.position[1]);
+            for (auto bodyId : dynamicBodies) {
+                auto* body = physicsEngine.getRigidBody(bodyId);
+                if (body) {
+                    float height = body->transform.position[1];
+                    avgHeight += height;
+                    minHeight = std::min(minHeight, height);
+                    maxHeight = std::max(maxHeight, height);
+                    activeBodies++;
+                }
             }
-            if (!particles.empty()) {
-                avgHeight /= particles.size();
+            
+            if (activeBodies > 0) {
+                avgHeight /= activeBodies;
             }
             
             // Log performance statistics
-            Logger::getInstance().logParticleCount(static_cast<uint32_t>(particles.size()));
             LOG_PERFORMANCE_INFO("FPS: " + std::to_string(frameCount) + 
-                               ", Avg Height: " + std::to_string(avgHeight));
+                               ", Avg RigidBody Height: " + std::to_string(avgHeight));
             
             std::cout << "FPS: " << frameCount 
-                      << ", Particles: " << particles.size()
-                      << ", Layers: " << physicsLayerWorker->getLayerCount()
+                      << ", RigidBodies: " << activeBodies
+                      << ", Particles: " << physicsEngine.getParticleCount()
                       << ", Avg Height: " << avgHeight
                       << ", Min Height: " << minHeight
                       << ", Max Height: " << maxHeight
@@ -159,10 +227,14 @@ int main() {
         }
     }
     
-    // Cleanup managers
-    physicsManager.cleanup();
-    vulkanManager.cleanup();
+    // Cleanup
+    physicsEngine.cleanup();
+#ifdef VULKAN_AVAILABLE
+    if (vulkanAvailable && vulkanManager) {
+        vulkanManager->cleanup();
+    }
+#endif
     
-    std::cout << "Simulation ended." << std::endl;
+    std::cout << "Titanium Physics simulation ended." << std::endl;
     return 0;
 }
