@@ -54,6 +54,8 @@ add_executable(titanium-gpu-physics
     src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/BaseCPUPhysicsSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/EnhancedCPUPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteComponents.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteEntity.cpp
     # Physics Managers
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/CPUPhysicsManager.cpp
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/RigidBodyWorker.cpp
@@ -126,6 +128,8 @@ add_executable(physics-tests
     src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/BaseCPUPhysicsSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/EnhancedCPUPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteComponents.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteEntity.cpp
     ${VULKAN_SOURCES}
     # CPU Physics Workers
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/RigidBodyWorker.cpp
@@ -161,6 +165,8 @@ add_executable(legacy-physics-tests
     src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/BaseCPUPhysicsSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/EnhancedCPUPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteComponents.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteEntity.cpp
     ${VULKAN_SOURCES}
     # CPU Physics Workers
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/RigidBodyWorker.cpp
@@ -193,6 +199,8 @@ add_executable(test-titanium-physics
     src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/BaseCPUPhysicsSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/EnhancedCPUPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteComponents.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteEntity.cpp
     # Physics Managers
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/CPUPhysicsManager.cpp
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/RigidBodyWorker.cpp
@@ -227,6 +235,8 @@ add_executable(titanium-demo-cpu
     src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/BaseCPUPhysicsSystem.cpp
     src/PhysicsEngine/CPUPhysicsEngine/systems/EnhancedCPUPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteComponents.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteEntity.cpp
     # Physics Managers
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/CPUPhysicsManager.cpp
     src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/RigidBodyWorker.cpp
@@ -248,3 +258,37 @@ target_link_libraries(titanium-demo-cpu
 
 # Register CPU demo test with CTest
 add_test(NAME TitaniumCPUDemo COMMAND titanium-demo-cpu)
+
+# Interface demo executable
+add_executable(interface-demo
+    src/PhysicsEngine/CPUPhysicsEngine/tests/interface_demo.cpp
+    # Core physics system
+    src/PhysicsEngine/CPUPhysicsEngine/CPUPhysicsEngine.cpp
+    # ECS Architecture
+    src/PhysicsEngine/CPUPhysicsEngine/managers/ECSManager/ECSManager.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/factories/RigidbodyComponentFactory.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/factories/RigidbodyEntityFactory.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/systems/BaseCPUPhysicsSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/systems/EnhancedCPUPhysicsCollisionSystem.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteComponents.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/concrete/ConcreteEntity.cpp
+    # Physics Managers
+    src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/CPUPhysicsManager.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/RigidBodyWorker.cpp
+    src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/workers/PhysicsLayerWorker.cpp
+    src/PhysicsEngine/managers/logmanager/Logger.cpp
+)
+
+target_include_directories(interface-demo PRIVATE
+    src
+    ${VULKAN_INCLUDE_DIRS}
+)
+
+# Link libraries
+target_link_libraries(interface-demo
+    ${VULKAN_LIBRARIES}
+)
+
+# Register interface demo test with CTest
+add_test(NAME InterfaceDemo COMMAND interface-demo)
