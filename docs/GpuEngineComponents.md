@@ -17,7 +17,7 @@ This document provides detailed information about all components and managers th
 
 **Purpose**: Fundamental data structure for GPU physics simulation.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/Particle.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/Particle.h`
 
 ```cpp
 struct Particle {
@@ -53,7 +53,7 @@ The GPU Physics Engine uses a modular Vulkan architecture with specialized compo
 
 **Purpose**: Main orchestrator for all Vulkan resources and operations.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/vulkan/VulkanContext.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/VulkanContext.h`
 
 ```cpp
 class VulkanContext {
@@ -89,7 +89,7 @@ public:
 
 **Purpose**: Manages Vulkan instance creation and validation layers.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/vulkan/VulkanInstance.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/VulkanInstance.h`
 
 ```cpp
 class VulkanInstance {
@@ -149,7 +149,7 @@ bool VulkanInstance::checkValidationLayerSupport() {
 
 **Purpose**: Handles physical device selection and logical device creation.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/vulkan/VulkanDevice.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/VulkanDevice.h`
 
 ```cpp
 class VulkanDevice {
@@ -219,7 +219,7 @@ bool VulkanDevice::findComputeQueueFamily() {
 
 **Purpose**: Manages command buffer allocation and recording.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/vulkan/VulkanCommandPool.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/VulkanCommandPool.h`
 
 ```cpp
 class VulkanCommandPool {
@@ -256,7 +256,7 @@ private:
 
 **Purpose**: Manages GPU buffer allocation, memory management, and data transfer.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/vulkan/physics/BufferManager.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/physics/BufferManager.h`
 
 ```cpp
 class BufferManager {
@@ -384,7 +384,7 @@ uint32_t BufferManager::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlag
 
 **Purpose**: Manages compute shader pipeline for physics calculations.
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/vulkan/physics/ComputePipeline.h`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/physics/ComputePipeline.h`
 
 ```cpp
 class ComputePipeline {
@@ -510,7 +510,7 @@ Managers provide high-level coordination and specialized functionality for diffe
 
 **Purpose**: High-level Vulkan resource management and coordination.
 
-**Location**: `src/physics_engine/gpu_physics_engine/managers/vulkanmanager/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/vulkanmanager/`
 
 **Responsibilities**:
 - **Resource Lifecycle**: Coordinate creation and destruction of Vulkan resources
@@ -522,7 +522,7 @@ Managers provide high-level coordination and specialized functionality for diffe
 
 **Purpose**: Manages compute shader loading, compilation, and caching.
 
-**Location**: `src/physics_engine/gpu_physics_engine/managers/shadermanager/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/shadermanager/`
 
 **Key Features**:
 - **Shader Loading**: Load SPIR-V shaders from files or embedded resources
@@ -551,7 +551,7 @@ public:
 
 **Purpose**: High-level particle system management and operations.
 
-**Location**: `src/physics_engine/gpu_physics_engine/managers/particlemanager/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/particlemanager/`
 
 **Responsibilities**:
 - **Particle Lifecycle**: Create, update, and destroy particles
@@ -585,7 +585,7 @@ public:
 
 **Purpose**: Coordinates physics simulation and computation management.
 
-**Location**: `src/physics_engine/gpu_physics_engine/managers/physicsmanager/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/physicsmanager/`
 
 **Responsibilities**:
 - **Simulation Control**: Start, stop, pause physics simulation
@@ -597,7 +597,7 @@ public:
 
 **Purpose**: Handles collision detection and response for GPU particles.
 
-**Location**: `src/physics_engine/gpu_physics_engine/managers/collisionmanager/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/collisionmanager/`
 
 **Features**:
 - **Broad Phase**: Efficient broad-phase collision detection on GPU
@@ -609,7 +609,7 @@ public:
 
 ### Compute Shader Architecture
 
-**Location**: `src/physics_engine/gpu_physics_engine/components/shaders/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/components/shaders/`
 
 The GPU Physics Engine uses SPIR-V compute shaders for physics calculations:
 

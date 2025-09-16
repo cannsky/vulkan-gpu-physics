@@ -18,7 +18,7 @@ Components are pure data structures that define the properties and state of enti
 
 **Purpose**: Spatial representation of entities in 3D space.
 
-**Location**: `src/physics_engine/cpu_physics_engine/components.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/components.h`
 
 ```cpp
 struct TransformComponent {
@@ -42,7 +42,7 @@ struct TransformComponent {
 
 **Purpose**: Dynamic properties for physics simulation and behavior.
 
-**Location**: `src/physics_engine/cpu_physics_engine/components.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/components.h`
 
 ```cpp
 struct PhysicsComponent {
@@ -77,7 +77,7 @@ struct PhysicsComponent {
 
 **Purpose**: Defines collision shape and boundaries for physics objects.
 
-**Location**: `src/physics_engine/cpu_physics_engine/components.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/components.h`
 
 ```cpp
 struct BoxColliderComponent {
@@ -104,7 +104,7 @@ struct BoxColliderComponent {
 
 **Purpose**: Complete rigidbody entity with all components for legacy compatibility.
 
-**Location**: `src/physics_engine/cpu_physics_engine/components.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/components.h`
 
 ```cpp
 struct RigidBodyComponent {
@@ -131,7 +131,7 @@ Managers handle the lifecycle and organization of entities and components within
 
 **Purpose**: Core ECS implementation managing entities and components.
 
-**Location**: `src/physics_engine/cpu_physics_engine/managers/ecs_manager/`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/managers/ECSManager/`
 
 #### Key Responsibilities:
 1. **Entity Management**: Create, destroy, and validate entities
@@ -190,7 +190,7 @@ private:
 
 **Purpose**: High-level coordination of CPU physics operations.
 
-**Location**: `src/physics_engine/cpu_physics_engine/managers/physicsmanager/`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/managers/physicsmanager/`
 
 #### Responsibilities:
 1. **Worker Coordination**: Manages specialized worker components
@@ -210,7 +210,7 @@ Factories handle the creation and initialization of complex entities with multip
 
 **Purpose**: Creates and configures individual rigidbody components.
 
-**Location**: `src/physics_engine/cpu_physics_engine/factories/rigidbody_component_factory.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/factories/RigidbodyComponentFactory.h`
 
 #### Responsibilities:
 1. **Component Creation**: Instantiate physics components with proper defaults
@@ -237,7 +237,7 @@ public:
 
 **Purpose**: Creates complete rigidbody entities with all required components.
 
-**Location**: `src/physics_engine/cpu_physics_engine/factories/rigidbody_entity_factory.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/factories/RigidbodyEntityFactory.h`
 
 #### Responsibilities:
 1. **Entity Creation**: Create entities with all rigidbody components
@@ -301,7 +301,7 @@ Systems contain the logic that operates on entities with specific component comb
 
 **Purpose**: Handles collision detection, response, and physics integration.
 
-**Location**: `src/physics_engine/cpu_physics_engine/systems/cpu_physics_collision_system.h`
+**Location**: `src/PhysicsEngine/CPUPhysicsEngine/systems/CpuPhysicsCollisionSystem.h`
 
 #### Core Responsibilities:
 1. **Collision Detection**: Find colliding pairs of rigidbodies

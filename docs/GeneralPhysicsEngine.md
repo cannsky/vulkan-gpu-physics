@@ -28,7 +28,7 @@ The Titanium Physics Engine implements a **hybrid CPU/GPU approach** that levera
 
 ### Main PhysicsEngine Class
 
-**Location**: `src/physics_engine/physics_engine.h`
+**Location**: `src/PhysicsEngine/PhysicsEngine.h`
 
 ```cpp
 /**
@@ -496,7 +496,7 @@ public:
 
 ### Basic Hybrid Setup
 ```cpp
-#include "physics_engine.h"
+#include "PhysicsEngine.h"
 
 int main() {
     PhysicsEngine physicsEngine;
