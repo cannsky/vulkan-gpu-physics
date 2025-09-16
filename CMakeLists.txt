@@ -27,6 +27,7 @@ if(Vulkan_FOUND)
         src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/BroadPhaseWorker.cpp
         src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/DetectCollisionWorker.cpp
         src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/ContactResolverWorker.cpp
+        src/physics_engine/gpu_physics_engine/managers/collisionmanager/workers/GPUBufferWorker.cpp
     )
     set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
     set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
