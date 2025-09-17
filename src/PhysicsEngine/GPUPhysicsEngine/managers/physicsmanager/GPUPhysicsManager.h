@@ -7,7 +7,6 @@
 // Forward declarations
 class VulkanManager;
 class ParticleManager;
-class CollisionManager;
 
 /**
  * GPU-side physics management system.
@@ -32,7 +31,6 @@ public:
     
     // Subsystem accessors
     std::shared_ptr<ParticleManager> getParticleManager() const;
-    std::shared_ptr<CollisionManager> getCollisionManager() const;
 
 private:
     GPUPhysicsManager() = default;

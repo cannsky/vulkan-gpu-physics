@@ -1,4 +1,4 @@
-#include "../../../../PhysicsEngine/GPUPhysicsEngine/managers/collisionmanager/CollisionManager.h"
+// CollisionManager removed; tests are deprecated
 #include "../../../../PhysicsEngine/CPUPhysicsEngine/rigidbody/RigidBodySystem.h"
 #include "../../../../PhysicsEngine/managers/logmanager/Logger.h"
 #include "../TestManager.h"
