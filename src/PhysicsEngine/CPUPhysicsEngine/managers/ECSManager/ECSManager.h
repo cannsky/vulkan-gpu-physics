@@ -65,7 +65,20 @@ public:
     bool hasComponent(uint32_t entityId) const;
     
     template<typename T>
+    bool addComponent(uint32_t entityId, const T& component);
+    
+    template<typename T>
+    bool removeComponent(uint32_t entityId);
+    
+    template<typename T>
     std::vector<uint32_t> getEntitiesWithComponent() const;
+    
+    // Multi-component query methods
+    template<typename T1, typename T2, typename T3>
+    std::vector<uint32_t> getEntitiesWith() const;
+    
+    template<typename T1, typename T2, typename T3>
+    size_t getEntityCountWith() const;
     
     // Statistics
     size_t getEntityCount() const { return entities.size(); }
@@ -118,5 +131,32 @@ std::vector<uint32_t> ECSManager::getEntitiesWithComponent<PhysicsComponent>() c
 
 template<>
 std::vector<uint32_t> ECSManager::getEntitiesWithComponent<BoxColliderComponent>() const;
+
+// Template specializations for addComponent
+template<>
+bool ECSManager::addComponent<TransformComponent>(uint32_t entityId, const TransformComponent& component);
+
+template<>
+bool ECSManager::addComponent<PhysicsComponent>(uint32_t entityId, const PhysicsComponent& component);
+
+template<>
+bool ECSManager::addComponent<BoxColliderComponent>(uint32_t entityId, const BoxColliderComponent& component);
+
+// Template specializations for removeComponent
+template<>
+bool ECSManager::removeComponent<TransformComponent>(uint32_t entityId);
+
+template<>
+bool ECSManager::removeComponent<PhysicsComponent>(uint32_t entityId);
+
+template<>
+bool ECSManager::removeComponent<BoxColliderComponent>(uint32_t entityId);
+
+// Template specializations for multi-component queries
+template<>
+std::vector<uint32_t> ECSManager::getEntitiesWith<TransformComponent, PhysicsComponent, BoxColliderComponent>() const;
+
+template<>
+size_t ECSManager::getEntityCountWith<TransformComponent, PhysicsComponent, BoxColliderComponent>() const;
 
 } // namespace cpu_physics

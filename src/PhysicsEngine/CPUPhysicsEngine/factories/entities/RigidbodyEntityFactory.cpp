@@ -68,7 +68,7 @@ uint32_t RigidBodyEntityFactory::createRigidBodyWithComponents(
 }
 
 bool RigidBodyEntityFactory::destroyRigidBody(uint32_t entityId) {
-    if (!ecsManager->isValidEntity(entityId)) return false;
+    if (!ecsManager->isEntityValid(entityId)) return false;
     ecsManager->removeComponent<TransformComponent>(entityId);
     ecsManager->removeComponent<PhysicsComponent>(entityId);
     ecsManager->removeComponent<BoxColliderComponent>(entityId);
@@ -76,7 +76,7 @@ bool RigidBodyEntityFactory::destroyRigidBody(uint32_t entityId) {
 }
 
 bool RigidBodyEntityFactory::isValidRigidBody(uint32_t entityId) const {
-    return ecsManager->isValidEntity(entityId) &&
+    return ecsManager->isEntityValid(entityId) &&
         ecsManager->hasComponent<TransformComponent>(entityId) &&
         ecsManager->hasComponent<PhysicsComponent>(entityId) &&
         ecsManager->hasComponent<BoxColliderComponent>(entityId);
