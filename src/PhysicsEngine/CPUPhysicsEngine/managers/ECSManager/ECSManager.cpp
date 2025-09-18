@@ -201,4 +201,63 @@ std::vector<uint32_t> ECSManager::getEntitiesWithComponent<BoxColliderComponent>
     return getEntitiesWithBoxColliderComponent();
 }
 
+// Template specializations for addComponent
+template<>
+bool ECSManager::addComponent<TransformComponent>(uint32_t entityId, const TransformComponent& component) {
+    return addComponent(entityId, component);
+}
+
+template<>
+bool ECSManager::addComponent<PhysicsComponent>(uint32_t entityId, const PhysicsComponent& component) {
+    return addComponent(entityId, component);
+}
+
+template<>
+bool ECSManager::addComponent<BoxColliderComponent>(uint32_t entityId, const BoxColliderComponent& component) {
+    return addComponent(entityId, component);
+}
+
+// Template specializations for removeComponent
+template<>
+bool ECSManager::removeComponent<TransformComponent>(uint32_t entityId) {
+    return removeComponent(entityId, std::type_index(typeid(TransformComponent)));
+}
+
+template<>
+bool ECSManager::removeComponent<PhysicsComponent>(uint32_t entityId) {
+    return removeComponent(entityId, std::type_index(typeid(PhysicsComponent)));
+}
+
+template<>
+bool ECSManager::removeComponent<BoxColliderComponent>(uint32_t entityId) {
+    return removeComponent(entityId, std::type_index(typeid(BoxColliderComponent)));
+}
+
+// Template specializations for multi-component queries
+template<>
+std::vector<uint32_t> ECSManager::getEntitiesWith<TransformComponent, PhysicsComponent, BoxColliderComponent>() const {
+    std::vector<uint32_t> result;
+    for (uint32_t entityId : entities) {
+        if (hasTransformComponent(entityId) && 
+            hasPhysicsComponent(entityId) && 
+            hasBoxColliderComponent(entityId)) {
+            result.push_back(entityId);
+        }
+    }
+    return result;
+}
+
+template<>
+size_t ECSManager::getEntityCountWith<TransformComponent, PhysicsComponent, BoxColliderComponent>() const {
+    size_t count = 0;
+    for (uint32_t entityId : entities) {
+        if (hasTransformComponent(entityId) && 
+            hasPhysicsComponent(entityId) && 
+            hasBoxColliderComponent(entityId)) {
+            count++;
+        }
+    }
+    return count;
+}
+
 } // namespace cpu_physics
