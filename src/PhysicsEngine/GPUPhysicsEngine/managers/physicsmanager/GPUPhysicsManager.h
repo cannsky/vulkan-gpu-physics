@@ -6,11 +6,16 @@
 
 // Forward declarations
 class VulkanManager;
-class ParticleManager;
+
+namespace gpu_physics {
+    class ECSManager;
+    class ParticlePhysicsSystem;
+}
 
 /**
  * GPU-side physics management system.
- * Handles particles, fluids and limited collision interactions with CPU physics.
+ * Handles particles using ECS architecture for efficient GPU data management.
+ * No longer handles collisions - particles only.
  */
 class GPUPhysicsManager : public BaseManager {
 public:
@@ -30,7 +35,8 @@ public:
     uint32_t getMaxParticles() const { return maxParticles; }
     
     // Subsystem accessors
-    std::shared_ptr<ParticleManager> getParticleManager() const;
+    std::shared_ptr<gpu_physics::ECSManager> getECSManager() const;
+    std::shared_ptr<gpu_physics::ParticlePhysicsSystem> getParticlePhysicsSystem() const;
 
 private:
     GPUPhysicsManager() = default;
@@ -38,6 +44,10 @@ private:
     
     bool initialized = false;
     uint32_t maxParticles = 1024;
+    
+    // ECS-based particle system
+    std::shared_ptr<gpu_physics::ECSManager> ecsManager;
+    std::shared_ptr<gpu_physics::ParticlePhysicsSystem> particlePhysicsSystem;
     
     struct {
         float x = 0.0f;

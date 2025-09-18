@@ -1,6 +1,8 @@
 #include "GPUPhysicsManager.h"
 #include "../vulkanmanager/VulkanManager.h"
-#include "../particlemanager/ParticleManager.h"
+#include "../ecsmanager/ECSManager.h"
+#include "../../systems/ParticlePhysicsSystem.h"
+#include <iostream>
 
 GPUPhysicsManager& GPUPhysicsManager::getInstance() {
     static GPUPhysicsManager instance;
@@ -13,13 +15,37 @@ bool GPUPhysicsManager::initialize() {
     }
     
     try {
-        // Ensure VulkanManager is initialized
+        // Ensure VulkanManager is initialized (optional for CPU-only builds)
         auto& vulkanManager = VulkanManager::getInstance();
         if (!vulkanManager.isInitialized()) {
             if (!vulkanManager.initialize()) {
-                return false;
+                std::cout << "Warning: Vulkan Manager failed to initialize, GPU operations will be limited" << std::endl;
             }
         }
+        
+        // Initialize ECS Manager
+        ecsManager = std::shared_ptr<gpu_physics::ECSManager>(&gpu_physics::ECSManager::getInstance(), [](gpu_physics::ECSManager*){});
+        ecsManager->setMaxParticles(maxParticles);
+        if (!ecsManager->initialize()) {
+            return false;
+        }
+        
+        // Initialize Particle Physics System
+        particlePhysicsSystem = std::make_shared<gpu_physics::ParticlePhysicsSystem>();
+        particlePhysicsSystem->setECSManager(ecsManager);
+        
+        // Set VulkanManager if available
+        if (vulkanManager.isInitialized()) {
+            auto vulkanManagerPtr = std::shared_ptr<VulkanManager>(&vulkanManager, [](VulkanManager*){});
+            particlePhysicsSystem->setVulkanManager(vulkanManagerPtr);
+        }
+        
+        if (!particlePhysicsSystem->initialize()) {
+            return false;
+        }
+        
+        // Set initial gravity
+        particlePhysicsSystem->setGravity(gravity.x, gravity.y, gravity.z);
         
         initialized = true;
         return true;
@@ -31,7 +57,15 @@ bool GPUPhysicsManager::initialize() {
 
 void GPUPhysicsManager::cleanup() {
     // Cleanup subsystems
-    ParticleManager::getInstance().cleanup();
+    if (particlePhysicsSystem) {
+        particlePhysicsSystem->cleanup();
+        particlePhysicsSystem.reset();
+    }
+    
+    if (ecsManager) {
+        ecsManager->cleanup();
+        ecsManager.reset();
+    }
     
     initialized = false;
 }
@@ -45,10 +79,9 @@ void GPUPhysicsManager::updatePhysics(float deltaTime) {
         return;
     }
     
-    // Update particle system
-    auto particleManager = getParticleManager();
-    if (particleManager && particleManager->isInitialized()) {
-        particleManager->updatePhysics(deltaTime);
+    // Update particle physics system
+    if (particlePhysicsSystem && particlePhysicsSystem->isInitialized()) {
+        particlePhysicsSystem->updatePhysics(deltaTime);
     }
 }
 
@@ -57,10 +90,9 @@ void GPUPhysicsManager::setGravity(float x, float y, float z) {
     gravity.y = y;
     gravity.z = z;
     
-    // Propagate to particle system
-    auto particleManager = getParticleManager();
-    if (particleManager && particleManager->isInitialized()) {
-        particleManager->setGravity(x, y, z);
+    // Propagate to particle physics system
+    if (particlePhysicsSystem && particlePhysicsSystem->isInitialized()) {
+        particlePhysicsSystem->setGravity(x, y, z);
     }
 }
 
@@ -74,8 +106,10 @@ bool GPUPhysicsManager::setMaxParticles(uint32_t newMaxParticles) {
     return true;
 }
 
-std::shared_ptr<ParticleManager> GPUPhysicsManager::getParticleManager() const {
-    return std::shared_ptr<ParticleManager>(&ParticleManager::getInstance(), [](ParticleManager*){});
+std::shared_ptr<gpu_physics::ECSManager> GPUPhysicsManager::getECSManager() const {
+    return ecsManager;
 }
 
-// GPU no longer exposes a collision manager; particles only
+std::shared_ptr<gpu_physics::ParticlePhysicsSystem> GPUPhysicsManager::getParticlePhysicsSystem() const {
+    return particlePhysicsSystem;
+}

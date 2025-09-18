@@ -547,38 +547,63 @@ public:
 };
 ```
 
-### Particle Manager
+### ECS Manager
 
-**Purpose**: High-level particle system management and operations.
+**Purpose**: Entity-Component-System management for efficient GPU particle physics.
 
-**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/particlemanager/`
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/ecsmanager/`
 
-**Responsibilities**:
-- **Particle Lifecycle**: Create, update, and destroy particles
-- **Batch Operations**: Efficient batch particle operations
-- **Memory Management**: Manage particle buffer allocation and growth
-- **Performance Optimization**: Optimize particle system performance
+**Key Features**:
+- **Entity Management**: Lightweight entity creation and destruction
+- **Component Storage**: Efficient storage for particle components
+- **Static CPU Offloading**: Component-level configuration for CPU data transfer
+- **GPU Optimization**: Designed for efficient GPU data upload/download
 
 ```cpp
-class ParticleManager {
+namespace gpu_physics {
+class ECSManager {
 public:
-    // Particle operations
-    uint32_t addParticle(const Particle& particle);
-    bool removeParticle(uint32_t particleId);
-    void clearAllParticles();
+    // Entity management
+    uint32_t createEntity();
+    bool destroyEntity(uint32_t entityId);
     
-    // Batch operations
-    void addParticles(const std::vector<Particle>& particles);
-    void updateParticles(const std::vector<uint32_t>& ids, const std::vector<Particle>& particles);
+    // Component management with static CPU offloading flags
+    bool addParticleComponent(uint32_t entityId, const ParticleComponent& component);
+    bool addParticleComponentWithCPUOffloading(uint32_t entityId, const ParticleComponentWithCPUOffloading& component);
     
-    // Query operations
-    std::vector<Particle> getParticlesInRegion(const BoundingBox& region);
-    size_t getParticleCount() const;
-    
-    // Memory management
-    void reserveParticleCapacity(uint32_t capacity);
-    void compactParticleMemory();
+    // Efficient data access for GPU operations
+    std::vector<ParticleComponent> getParticleComponentData() const;
+    std::vector<ParticleComponentWithCPUOffloading> getParticleComponentWithCPUOffloadingData() const;
 };
+}
+```
+
+### Particle Physics System
+
+**Purpose**: Handles GPU-CPU data transfer and physics simulation coordination.
+
+**Location**: `src/PhysicsEngine/GPUPhysicsEngine/systems/`
+
+**Key Features**:
+- **GPU Data Transfer**: Efficient upload/download of particle data
+- **Static CPU Offloading**: Uses component-level flags to avoid per-particle checks
+- **Physics Coordination**: Manages GPU compute shader execution
+- **Performance Optimization**: Selective data transfer based on component types
+
+```cpp
+namespace gpu_physics {
+class ParticlePhysicsSystem {
+public:
+    // Physics simulation
+    void updatePhysics(float deltaTime);
+    void setGravity(float x, float y, float z);
+    
+    // GPU operations (optimized with static cpu_offloading flags)
+    void uploadParticlesToGPU();
+    void downloadParticlesFromGPU(); // Only for cpu_offloading components
+    void updateUniformBuffer(float deltaTime);
+};
+}
 ```
 
 ### Physics Manager
@@ -589,21 +614,24 @@ public:
 
 **Responsibilities**:
 - **Simulation Control**: Start, stop, pause physics simulation
-- **Time Management**: Handle variable time steps and simulation speed
-- **Force Management**: Apply forces and constraints to particles
-- **Integration Methods**: Manage different numerical integration schemes
+- **ECS Coordination**: Manages ECS Manager and Particle Physics System
+- **GPU Resource Management**: Coordinates with Vulkan Manager
+- **Performance Optimization**: Optimized for particle-only physics (no collisions)
 
-### Collision Manager
+```cpp
+class GPUPhysicsManager {
+public:
+    // Physics simulation
+    void updatePhysics(float deltaTime);
+    void setGravity(float x, float y, float z);
+    
+    // ECS system access
+    std::shared_ptr<gpu_physics::ECSManager> getECSManager() const;
+    std::shared_ptr<gpu_physics::ParticlePhysicsSystem> getParticlePhysicsSystem() const;
+};
+```
 
-**Purpose**: Handles collision detection and response for GPU particles.
-
-**Location**: `src/PhysicsEngine/GPUPhysicsEngine/managers/collisionmanager/`
-
-**Features**:
-- **Broad Phase**: Efficient broad-phase collision detection on GPU
-- **Spatial Acceleration**: GPU-based spatial data structures
-- **Collision Response**: GPU-based collision response calculations
-- **Boundary Conditions**: Handle simulation boundaries and constraints
+**Note**: Collision detection and response have been removed from GPU physics. The GPU system now focuses exclusively on particle simulation for optimal performance.
 
 ## Shader System
 
