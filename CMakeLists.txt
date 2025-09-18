@@ -21,9 +21,10 @@ if(Vulkan_FOUND)
         src/PhysicsEngine/GPUPhysicsEngine/components/vulkan/physics/ComputePipeline.cpp
         src/PhysicsEngine/GPUPhysicsEngine/managers/vulkanmanager/VulkanManager.cpp
         src/PhysicsEngine/GPUPhysicsEngine/managers/physicsmanager/GPUPhysicsManager.cpp
-        src/PhysicsEngine/GPUPhysicsEngine/managers/particlemanager/ParticleManager.cpp
+        src/PhysicsEngine/GPUPhysicsEngine/managers/ecsmanager/ECSManager.cpp
+        src/PhysicsEngine/GPUPhysicsEngine/systems/ParticlePhysicsSystem.cpp
         src/PhysicsEngine/GPUPhysicsEngine/managers/shadermanager/ShaderManager.cpp
-    # GPU collision manager removed; GPU handles particles only
+    # Collision manager and particle manager removed; replaced with ECS system
     )
     set(VULKAN_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
     set(VULKAN_LIBRARIES ${Vulkan_LIBRARIES})
